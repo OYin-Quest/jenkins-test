@@ -554,7 +554,7 @@
 			<then>
 				<echo message="${AutomationVM.Local.dir} exist!"/>
 				<delete includeEmptyDirs="true">
-					<fileset dir="${AutomationVM.Automation.dir}"/>
+					<fileset dir="${AutomationVM.Automation.dir}" excludes="NightlyBuild/"/>
 				</delete>
 				<echo message="Delete automation files ${AutomationVM.Local.dir} on VM"/>
 			</then>
