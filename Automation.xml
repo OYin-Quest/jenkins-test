@@ -258,10 +258,10 @@
 			<arg value="${JenkinsEnv.JOB_NAME}"/>
 			<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
 		    <arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-			<arg line="--username"/>
+			<!--arg line="username"/>
 			<arg line="${JenkinsServer.Username}"/>
-			<arg line="--password"/>
-			<arg line="${JenkinsServer.Password}"/>
+			<arg line="password"/>
+			<arg line="${JenkinsServer.Password}"/-->
 		    <classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/jenkins-cli.jar"/>
 				<pathelement path="${java.class.path}"/>
