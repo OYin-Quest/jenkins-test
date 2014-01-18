@@ -83,6 +83,9 @@
 			<Node name="script\master_notepad.sj">
 				<Prp name="relpath" type="S" value="Script\master_notepad.sj"/>
 			</Node>
+			<Node name="script\print_notepad.sj">
+				<Prp name="relpath" type="S" value="Script\print_notepad.sj"/>
+			</Node>
 			<Node name="script\script.tcscript">
 				<Prp name="relpath" type="S" value="Script\Script.tcScript"/>
 			</Node>
