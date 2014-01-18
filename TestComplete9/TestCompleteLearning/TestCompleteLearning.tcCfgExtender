@@ -37,11 +37,11 @@
 					<Node name="0">
 						<Node name="editor">
 							<Node name="{8c45957c-f4b3-4dd7-9212-49cbd350f69f}">
-								<Prp name="key" type="S" value="{B3CF2D9C-C7DD-490F-955C-3DDCA86F57C9}"/>
+								<Prp name="key" type="S" value="{FA83F301-3541-4B06-A8C2-EAE478F177CB}"/>
 							</Node>
 							<Node name="{d0151f8e-51fe-49da-8534-008b9f1b7c45}">
 								<Prp name="col" type="I" value="1"/>
-								<Prp name="key" type="S" value="{15563F92-717B-46F3-8E3C-AF57E22C50C5}"/>
+								<Prp name="key" type="S" value="{C52B4FA8-9C8B-4AAC-995F-C16B991961DF}"/>
 								<Prp name="line" type="I" value="6"/>
 								<Prp name="sellength" type="I" value="0"/>
 								<Prp name="selstart" type="I" value="126"/>
@@ -56,11 +56,11 @@
 					<Node name="1">
 						<Node name="editor">
 							<Node name="{8c45957c-f4b3-4dd7-9212-49cbd350f69f}">
-								<Prp name="key" type="S" value="{476440CC-EC4E-415B-B704-A1B9E25C76D8}"/>
+								<Prp name="key" type="S" value="{6081E315-557C-48E6-9691-D1435D5FA42B}"/>
 							</Node>
 							<Node name="{d0151f8e-51fe-49da-8534-008b9f1b7c45}">
 								<Prp name="col" type="I" value="0"/>
-								<Prp name="key" type="S" value="{45257D5B-1D9F-43CE-961A-6AA99D0E94B4}"/>
+								<Prp name="key" type="S" value="{81167F19-B787-4E7A-B509-149D00473F1C}"/>
 								<Prp name="line" type="I" value="0"/>
 								<Prp name="sellength" type="I" value="0"/>
 								<Prp name="selstart" type="I" value="0"/>
