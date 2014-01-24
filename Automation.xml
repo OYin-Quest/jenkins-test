@@ -258,10 +258,10 @@
 			<arg value="${JenkinsEnv.JOB_NAME}"/>
 			<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
 		    <arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-			<arg line="--username"/>
+			<!--arg line="username"/>
 			<arg line="${JenkinsServer.Username}"/>
-			<arg line="--password"/>
-			<arg line="${JenkinsServer.Password}"/>
+			<arg line="password"/>
+			<arg line="${JenkinsServer.Password}"/-->
 		    <classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/jenkins-cli.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -554,7 +554,7 @@
 			<then>
 				<echo message="${AutomationVM.Local.dir} exist!"/>
 				<delete includeEmptyDirs="true">
-					<fileset dir="${AutomationVM.Automation.dir}"/>
+					<fileset dir="${AutomationVM.Automation.dir}" excludes="NightlyBuild/"/>
 				</delete>
 				<echo message="Delete automation files ${AutomationVM.Local.dir} on VM"/>
 			</then>
