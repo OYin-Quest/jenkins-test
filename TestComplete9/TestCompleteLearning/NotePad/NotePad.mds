@@ -218,7 +218,7 @@
 				<Prp name="colcount" type="I" value="1"/>
 				<Prp name="colindex" type="I" value="0"/>
 				<Prp name="rowcount" type="I" value="4"/>
-				<Prp name="rowindex" type="I" value="3"/>
+				<Prp name="rowindex" type="I" value="1"/>
 				<Prp name="type" type="I" value="6"/>
 				<Prp name="val0x0" type="S" value="UTF-16"/>
 				<Prp name="val0x1" type="S" value="UTF-8"/>
