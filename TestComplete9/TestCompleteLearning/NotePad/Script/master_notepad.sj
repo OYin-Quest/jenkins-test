@@ -2,6 +2,7 @@
 
 function TestMethod()
 {
+    Log.Message("TestMethod");
     LaunchNotePad();
-    Log.Message(Aliases.wnd_Notepad.WndCaption);
+    Log.Message(Aliases.wnd_Notepad.WndCaption + "abc");
 }

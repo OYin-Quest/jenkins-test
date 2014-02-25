@@ -45,23 +45,23 @@
 			</Node>
 			<Node name="item0000000002">
 				<Node name="item data">
-					<Prp name="storage" type="S" value="Events\Events.tcAX"/>
-				</Node>
-				<Prp name="index" type="I" value="2"/>
-				<Prp name="key" type="S" value="{EADC8E29-EDC4-45FC-B840-1C2A005FE2CE}"/>
-				<Prp name="pluginname" type="S" value=""/>
-				<Prp name="type" type="S" value="{E7ABA87F-E873-4452-9921-6F4BAAEB2BCC}"/>
-				<Prp name="typename" type="S" value="Events"/>
-			</Node>
-			<Node name="item0000000003">
-				<Node name="item data">
 					<Prp name="relpath" type="S" value="NameMapping\NameMapping.tcNM"/>
 				</Node>
-				<Prp name="index" type="I" value="3"/>
+				<Prp name="index" type="I" value="2"/>
 				<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
 				<Prp name="pluginname" type="S" value="NameMapping"/>
 				<Prp name="type" type="S" value="{5DCBAC3B-D39C-497C-9BE8-744CBADD37AA}"/>
 				<Prp name="typename" type="S" value="Name Mapping"/>
+			</Node>
+			<Node name="item0000000003">
+				<Node name="item data">
+					<Prp name="storage" type="S" value="Events\Events.tcAX"/>
+				</Node>
+				<Prp name="index" type="I" value="3"/>
+				<Prp name="key" type="S" value="{D5F1D49F-2319-471D-AB4F-BC27C8B0EB91}"/>
+				<Prp name="pluginname" type="S" value=""/>
+				<Prp name="type" type="S" value="{E7ABA87F-E873-4452-9921-6F4BAAEB2BCC}"/>
+				<Prp name="typename" type="S" value="Events"/>
 			</Node>
 		</Node>
 		<Node name="config">
@@ -104,11 +104,11 @@
 						</Node>
 						<Node name="ref0000000001">
 							<Prp name="index" type="I" value="1"/>
-							<Prp name="key" type="S" value="{EADC8E29-EDC4-45FC-B840-1C2A005FE2CE}"/>
+							<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
 						</Node>
 						<Node name="ref0000000002">
 							<Prp name="index" type="I" value="2"/>
-							<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
+							<Prp name="key" type="S" value="{D5F1D49F-2319-471D-AB4F-BC27C8B0EB91}"/>
 						</Node>
 					</Node>
 					<Prp name="caption" type="S" value="Advanced"/>
@@ -432,11 +432,12 @@
 				<Prp name="col0type" type="I" value="5"/>
 				<Prp name="colcount" type="I" value="1"/>
 				<Prp name="colindex" type="I" value="0"/>
-				<Prp name="rowcount" type="I" value="9"/>
-				<Prp name="rowindex" type="I" value="8"/>
+				<Prp name="rowcount" type="I" value="11"/>
+				<Prp name="rowindex" type="I" value="10"/>
 				<Prp name="type" type="I" value="6"/>
 				<Prp name="val0x0" type="S" value="NativeVBObject"/>
 				<Prp name="val0x1" type="S" value="NativeDelphiObject"/>
+				<Prp name="val0x10" type="S" value="NativeChromeObject"/>
 				<Prp name="val0x2" type="S" value="NativeJavaObject"/>
 				<Prp name="val0x3" type="S" value="NativeClrObject"/>
 				<Prp name="val0x4" type="S" value="NativeCPPObject"/>
@@ -444,6 +445,7 @@
 				<Prp name="val0x6" type="S" value="NativeQtObject"/>
 				<Prp name="val0x7" type="S" value="NativeUIAObject"/>
 				<Prp name="val0x8" type="S" value="NativeMSAA"/>
+				<Prp name="val0x9" type="S" value="NativeTextObject"/>
 			</Node>
 			<Node name="{f544bc81-7a86-4230-b1fc-1b685211a0b4}">
 				<Prp name="type" type="I" value="5"/>
@@ -608,6 +610,17 @@
 			<Node name="recreateactivexobjects">
 				<Prp name="type" type="I" value="1"/>
 				<Prp name="value" type="B" value="0"/>
+			</Node>
+			<Node name="textrecognizer_acceptedwindows">
+				<Prp name="col0enabled" type="B" value="-1"/>
+				<Prp name="col0type" type="I" value="1"/>
+				<Prp name="col1enabled" type="B" value="-1"/>
+				<Prp name="col1type" type="I" value="5"/>
+				<Prp name="colcount" type="I" value="2"/>
+				<Prp name="colindex" type="I" value="1"/>
+				<Prp name="rowcount" type="I" value="0"/>
+				<Prp name="rowindex" type="I" value="-1"/>
+				<Prp name="type" type="I" value="6"/>
 			</Node>
 			<Prp name="key" type="S" value="{3C453DDB-A262-4FC3-8DD4-48633CB79DD2}"/>
 			<Prp name="settingsversion" type="S" value="9.10"/>
