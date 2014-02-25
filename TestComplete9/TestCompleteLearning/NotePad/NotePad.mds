@@ -80,6 +80,15 @@
 			<Node name="notepad.mds">
 				<Prp name="relpath" type="S" value="NotePad.mds"/>
 			</Node>
+			<Node name="script\aa.sj">
+				<Prp name="relpath" type="S" value="Script\aa.sj"/>
+			</Node>
+			<Node name="script\bb.sj">
+				<Prp name="relpath" type="S" value="Script\bb.sj"/>
+			</Node>
+			<Node name="script\item_one.sj">
+				<Prp name="relpath" type="S" value="Script\item_one.sj"/>
+			</Node>
 			<Node name="script\master_notepad.sj">
 				<Prp name="relpath" type="S" value="Script\master_notepad.sj"/>
 			</Node>
@@ -209,7 +218,7 @@
 				<Prp name="colcount" type="I" value="1"/>
 				<Prp name="colindex" type="I" value="0"/>
 				<Prp name="rowcount" type="I" value="4"/>
-				<Prp name="rowindex" type="I" value="1"/>
+				<Prp name="rowindex" type="I" value="3"/>
 				<Prp name="type" type="I" value="6"/>
 				<Prp name="val0x0" type="S" value="UTF-16"/>
 				<Prp name="val0x1" type="S" value="UTF-8"/>
