@@ -3,5 +3,5 @@
 function TestMethod()
 {
     LaunchNotePad();
-    Log.Message(Aliases.wnd_Notepad.WndCaption);
+    Log.Message(Aliases.wnd_Notepad.WndCaption + "bbb");
 }
