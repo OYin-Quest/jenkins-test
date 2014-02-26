@@ -70,16 +70,6 @@
 				<Prp name="type" type="S" value="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}"/>
 				<Prp name="typename" type="S" value="Script Unit"/>
 			</Node>
-			<Node name="item0000000005">
-				<Node name="item data">
-					<Prp name="relpath" type="S" value="bb.sj"/>
-				</Node>
-				<Prp name="index" type="I" value="5"/>
-				<Prp name="key" type="S" value="{ECF082F4-0CC7-4C02-8EF4-2B19A0EEE1F9}"/>
-				<Prp name="pluginname" type="S" value="Script"/>
-				<Prp name="type" type="S" value="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}"/>
-				<Prp name="typename" type="S" value="Script Unit"/>
-			</Node>
 		</Node>
 		<Node name="folders">
 			<Node name="folders"/>
