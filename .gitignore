@@ -1,4 +1,5 @@
 *.sj.bak
 *.orig
+*.tcCfgExtender
 TestComplete9/TestCompleteLearning/NotePad/Events/
 TestComplete9/TestCompleteLearning/NotePad/Log/
