@@ -1,4 +1,4 @@
 ﻿function AA()
 {
-	Log.Message("aaZZ");
+	Log.Message("aaAA");
 }

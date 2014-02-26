@@ -45,7 +45,7 @@
 					<Prp name="relpath" type="S" value="print_notepad.sj"/>
 				</Node>
 				<Prp name="index" type="I" value="2"/>
-				<Prp name="key" type="S" value="{8B199074-D45B-4A92-A1D4-C6C6176B5D34}"/>
+				<Prp name="key" type="S" value="{354B75DB-CB64-420E-9754-B967758029C9}"/>
 				<Prp name="pluginname" type="S" value="Script"/>
 				<Prp name="type" type="S" value="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}"/>
 				<Prp name="typename" type="S" value="Script Unit"/>
@@ -72,20 +72,10 @@
 			</Node>
 			<Node name="item0000000005">
 				<Node name="item data">
-					<Prp name="relpath" type="S" value="cc.sj"/>
-				</Node>
-				<Prp name="index" type="I" value="5"/>
-				<Prp name="key" type="S" value="{949171D5-5BEF-46BA-9689-0483E9FDDF4F}"/>
-				<Prp name="pluginname" type="S" value="Script"/>
-				<Prp name="type" type="S" value="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}"/>
-				<Prp name="typename" type="S" value="Script Unit"/>
-			</Node>
-			<Node name="item0000000006">
-				<Node name="item data">
 					<Prp name="relpath" type="S" value="bb.sj"/>
 				</Node>
-				<Prp name="index" type="I" value="6"/>
-				<Prp name="key" type="S" value="{42B8A717-C7EC-4383-8158-CB9BC3B649C9}"/>
+				<Prp name="index" type="I" value="5"/>
+				<Prp name="key" type="S" value="{629CE317-1F24-4FD7-80EE-9E72CC5C5FC0}"/>
 				<Prp name="pluginname" type="S" value="Script"/>
 				<Prp name="type" type="S" value="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}"/>
 				<Prp name="typename" type="S" value="Script Unit"/>

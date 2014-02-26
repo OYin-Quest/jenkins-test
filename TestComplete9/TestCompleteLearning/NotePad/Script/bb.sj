@@ -1,5 +1,5 @@
 ﻿function BB()
 {
-    var b;
-  Log.Message("bbZZ");
+  var c;
+  Log.Message("bbBBTT");
 }

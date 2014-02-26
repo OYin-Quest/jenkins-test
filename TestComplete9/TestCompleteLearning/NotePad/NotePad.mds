@@ -45,23 +45,23 @@
 			</Node>
 			<Node name="item0000000002">
 				<Node name="item data">
-					<Prp name="storage" type="S" value="Events\Events.tcAX"/>
-				</Node>
-				<Prp name="index" type="I" value="2"/>
-				<Prp name="key" type="S" value="{EADC8E29-EDC4-45FC-B840-1C2A005FE2CE}"/>
-				<Prp name="pluginname" type="S" value=""/>
-				<Prp name="type" type="S" value="{E7ABA87F-E873-4452-9921-6F4BAAEB2BCC}"/>
-				<Prp name="typename" type="S" value="Events"/>
-			</Node>
-			<Node name="item0000000003">
-				<Node name="item data">
 					<Prp name="relpath" type="S" value="NameMapping\NameMapping.tcNM"/>
 				</Node>
-				<Prp name="index" type="I" value="3"/>
+				<Prp name="index" type="I" value="2"/>
 				<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
 				<Prp name="pluginname" type="S" value="NameMapping"/>
 				<Prp name="type" type="S" value="{5DCBAC3B-D39C-497C-9BE8-744CBADD37AA}"/>
 				<Prp name="typename" type="S" value="Name Mapping"/>
+			</Node>
+			<Node name="item0000000003">
+				<Node name="item data">
+					<Prp name="storage" type="S" value="Events\Events.tcAX"/>
+				</Node>
+				<Prp name="index" type="I" value="3"/>
+				<Prp name="key" type="S" value="{D5F1D49F-2319-471D-AB4F-BC27C8B0EB91}"/>
+				<Prp name="pluginname" type="S" value=""/>
+				<Prp name="type" type="S" value="{E7ABA87F-E873-4452-9921-6F4BAAEB2BCC}"/>
+				<Prp name="typename" type="S" value="Events"/>
 			</Node>
 		</Node>
 		<Node name="config">
@@ -116,11 +116,11 @@
 						</Node>
 						<Node name="ref0000000001">
 							<Prp name="index" type="I" value="1"/>
-							<Prp name="key" type="S" value="{EADC8E29-EDC4-45FC-B840-1C2A005FE2CE}"/>
+							<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
 						</Node>
 						<Node name="ref0000000002">
 							<Prp name="index" type="I" value="2"/>
-							<Prp name="key" type="S" value="{AE3961A7-2B64-4096-9B7A-4CB498E6A648}"/>
+							<Prp name="key" type="S" value="{D5F1D49F-2319-471D-AB4F-BC27C8B0EB91}"/>
 						</Node>
 					</Node>
 					<Prp name="caption" type="S" value="Advanced"/>

@@ -1,4 +1,4 @@
 ﻿function CC()
 {
-  Log.Message("cc");
+  Log.Message("CC");
 }
