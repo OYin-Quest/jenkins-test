@@ -83,6 +83,9 @@
 			<Node name="script\aa.sj">
 				<Prp name="relpath" type="S" value="Script\aa.sj"/>
 			</Node>
+			<Node name="script\bb.sj">
+				<Prp name="relpath" type="S" value="Script\bb.sj"/>
+			</Node>
 			<Node name="script\cc.sj">
 				<Prp name="relpath" type="S" value="Script\cc.sj"/>
 			</Node>
