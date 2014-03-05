@@ -25,7 +25,6 @@
 	<condition property="Product.DataPoint" else="false">
 		<contains string="${ProductName}" substring="DataPoint"/>
     </condition>
-	
 	  
 	<if>
 		<equals arg1="${Product.TIC}" arg2="true"/>
@@ -44,6 +43,17 @@
 	
 	 <property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	 <property environment="JenkinsEnv"/>
+	
+	<condition property="Automation.TestExecutable.set" else="false">
+		<isset property="Automation.TestExecutable"/>
+	</condition>
+	<if>
+		<equals arg1="${Automation.TestExecutable.set}" arg2="false"/>
+		<then>
+			<echo message="Automation.TestExecutable is not set, will be set to TestExecute by default!"/>
+			<property name="Automation.TestExecutable" value="TestExecute"/>
+		</then>
+	</if>
 	
 	<!-- Check whether AutomationVM property exists-->
 	<condition property="AutomationVM.property.exists" else="false">
