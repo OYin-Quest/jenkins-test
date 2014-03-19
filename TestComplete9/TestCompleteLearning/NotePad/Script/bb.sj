@@ -1,5 +1,5 @@
 ﻿function BB()
 {
   var c;
-  Log.Message("bbBBTT - topic-notepad");
+  Log.Message("bbBBTT - master");
 }

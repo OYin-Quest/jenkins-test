@@ -52,7 +52,7 @@
 		<AddTeamServerBy>IP</AddTeamServerBy>
 	</user>
 	<user>
-		<ID>1</ID>
+		<ID>5</ID>
 		<UserName>Ocean</UserName>
 		<PortNumber>3589</PortNumber>
 		<UserType>Existing</UserType>
@@ -63,33 +63,6 @@
 		<SavePassword>Y</SavePassword>
 		<AutoConnect>Y</AutoConnect>
 		<AddTeamServerBy>IP</AddTeamServerBy>
-		<Version>2.4</Version>
-	</user>
-	<user>
-		<ID>6</ID>
-		<UserName>OCEAN</UserName>
-		<PortNumber>3589</PortNumber>
-		<UserType>Existing</UserType>
-		<FullName>Ocean Yin</FullName>
-		<Email>Ocean@quest.com</Email>
-		<Password>234</Password>
-		<ConfirmPassword>234</ConfirmPassword>
-		<SavePassword>Y</SavePassword>
-		<AutoConnect>Y</AutoConnect>
-		<AddTeamServerBy>IP</AddTeamServerBy>
-	</user>
-	<user>
-		<ID>7</ID>
-		<Emails>
-			<Email>
-				<Domain>1.1</Domain>
-				<Name>1</Name>
-			</Email>
-			<Email>
-				<Domain>2.2</Domain>
-				<Name>2</Name>
-			</Email>
-			<Email>3@3.3</Email>
-		</Emails>
+		<Version>2.3</Version>
 	</user>
 </root>
