@@ -65,19 +65,9 @@
 			</Node>
 			<Node name="item0000000004">
 				<Node name="item data">
-					<Prp name="relpath" type="S" value="ODT\ODT.tcODT"/>
-				</Node>
-				<Prp name="index" type="I" value="4"/>
-				<Prp name="key" type="S" value="{72F01C1E-9467-4A04-ABEF-77E2E5632270}"/>
-				<Prp name="pluginname" type="S" value="ODT"/>
-				<Prp name="type" type="S" value="{7ABA5999-8A66-47F5-8D2C-2C0334223A97}"/>
-				<Prp name="typename" type="S" value="ODT"/>
-			</Node>
-			<Node name="item0000000005">
-				<Node name="item data">
 					<Prp name="relpath" type="S" value="Stores\Stores.tcStores"/>
 				</Node>
-				<Prp name="index" type="I" value="5"/>
+				<Prp name="index" type="I" value="4"/>
 				<Prp name="key" type="S" value="{E3C8657B-02B8-495E-9E14-C4DD9FB9B9F3}"/>
 				<Prp name="pluginname" type="S" value="Stores"/>
 				<Prp name="type" type="S" value="{5238AF17-5FE2-48FF-8BCC-9803A975A4F4}"/>
@@ -99,12 +89,6 @@
 			</Node>
 			<Node name="notepad.mds">
 				<Prp name="relpath" type="S" value="NotePad.mds"/>
-			</Node>
-			<Node name="odt\odt.tcodt">
-				<Prp name="relpath" type="S" value="ODT\ODT.tcODT"/>
-			</Node>
-			<Node name="odt\odt.xml">
-				<Prp name="relpath" type="S" value="ODT\ODT.xml"/>
 			</Node>
 			<Node name="script\aa.sj">
 				<Prp name="relpath" type="S" value="Script\aa.sj"/>
@@ -132,12 +116,6 @@
 			</Node>
 			<Node name="script\start_notepad.sj">
 				<Prp name="relpath" type="S" value="Script\start_notepad.sj"/>
-			</Node>
-			<Node name="stores\dbtables\dbtables.tcdb">
-				<Prp name="relpath" type="S" value="Stores\DBTables\DBTables.tcDB"/>
-			</Node>
-			<Node name="stores\dbtables\table1.tcbtable">
-				<Prp name="relpath" type="S" value="Stores\DBTables\Table1.tcBTable"/>
 			</Node>
 			<Node name="stores\files.tcfiles">
 				<Prp name="relpath" type="S" value="Stores\Files.tcFiles"/>
@@ -168,10 +146,6 @@
 						<Node name="ref0000000002">
 							<Prp name="index" type="I" value="2"/>
 							<Prp name="key" type="S" value="{D5F1D49F-2319-471D-AB4F-BC27C8B0EB91}"/>
-						</Node>
-						<Node name="ref0000000003">
-							<Prp name="index" type="I" value="3"/>
-							<Prp name="key" type="S" value="{72F01C1E-9467-4A04-ABEF-77E2E5632270}"/>
 						</Node>
 					</Node>
 					<Prp name="caption" type="S" value="Advanced"/>

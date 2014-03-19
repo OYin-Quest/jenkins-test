@@ -141,21 +141,19 @@
   </aa>
   <aa>
     <ID>12</ID>
-    <UserName>linda</UserName>
-    <PortNumber>3566</PortNumber>
+    <UserName>LInda</UserName>
+    <PortNumber>2166</PortNumber>
     <UserType>Existing</UserType>
     <FullName>Linda Zhong</FullName>
     <Email>Linda@quest.com</Email>
     <Password>123</Password>
     <ConfirmPassword>123</ConfirmPassword>
-    <SavePassword>Y</SavePassword>
-    <AutoConnect>Y</AutoConnect>
     <AddTeamServerBy>IP</AddTeamServerBy>
   </aa>
   <aa>
     <ID>13</ID>
-    <UserName>alisa</UserName>
-    <PortNumber>3566</PortNumber>
+    <UserName>Alisa</UserName>
+    <PortNumber>2166</PortNumber>
     <UserType>Existing</UserType>
     <FullName>Alisa You</FullName>
     <Email>Alisa@quest.com</Email>
@@ -167,8 +165,8 @@
   </aa>
   <aa>
     <ID>14</ID>
-    <UserName>ocean</UserName>
-    <PortNumber>3566</PortNumber>
+    <UserName>Ocean</UserName>
+    <PortNumber>2166</PortNumber>
     <UserType>Existing</UserType>
     <FullName>Ocean Yin</FullName>
     <Email>Ocean@quest.com</Email>
@@ -177,5 +175,15 @@
     <SavePassword>Y</SavePassword>
     <AutoConnect>Y</AutoConnect>
     <AddTeamServerBy>IP</AddTeamServerBy>
+  </aa>
+  <aa>
+    <ID>15</ID>
+    <UserName>TEST</UserName>
+    <PortNumber>2166</PortNumber>
+    <UserType>Existing</UserType>
+    <FullName>TEST</FullName>
+    <Email>TEST@quest.com</Email>
+    <Password>123</Password>
+    <ConfirmPassword>123</ConfirmPassword>
   </aa>
 </NewDataSet>
