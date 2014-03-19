@@ -64,5 +64,6 @@
 		<AutoConnect>Y</AutoConnect>
 		<AddTeamServerBy>IP</AddTeamServerBy>
 		<Version>2.3</Version>
+		<SubVersion>0.829</SubVersion>
 	</user>
 </root>
