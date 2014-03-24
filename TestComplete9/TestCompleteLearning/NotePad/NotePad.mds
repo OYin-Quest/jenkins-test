@@ -99,6 +99,9 @@
 			<Node name="script\cc.sj">
 				<Prp name="relpath" type="S" value="Script\cc.sj"/>
 			</Node>
+			<Node name="script\csvreader.sj">
+				<Prp name="relpath" type="S" value="Script\CsvReader.sj"/>
+			</Node>
 			<Node name="script\item_one.sj">
 				<Prp name="relpath" type="S" value="Script\item_one.sj"/>
 			</Node>
@@ -122,6 +125,12 @@
 			</Node>
 			<Node name="stores\files\addteamserver.xml">
 				<Prp name="relpath" type="S" value="Stores\Files\AddTeamServer.xml"/>
+			</Node>
+			<Node name="stores\files\datapointartifact.xml">
+				<Prp name="relpath" type="S" value="Stores\Files\DataPointArtifact.xml"/>
+			</Node>
+			<Node name="stores\files\ticadminconsolezhu.csv">
+				<Prp name="relpath" type="S" value="Stores\Files\TICAdminConsoleZhu.csv"/>
 			</Node>
 			<Node name="stores\files\user.xml">
 				<Prp name="relpath" type="S" value="Stores\Files\User.xml"/>

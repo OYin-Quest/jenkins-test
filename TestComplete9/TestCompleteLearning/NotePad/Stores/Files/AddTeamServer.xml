@@ -148,8 +148,6 @@
     <Email>Linda@quest.com</Email>
     <Password>123</Password>
     <ConfirmPassword>123</ConfirmPassword>
-    <SavePassword>Y</SavePassword>
-    <AutoConnect>Y</AutoConnect>
     <AddTeamServerBy>IP</AddTeamServerBy>
   </TeamServer>
   <TeamServer>
@@ -173,5 +171,15 @@
     <Password>123</Password>
     <ConfirmPassword>123</ConfirmPassword>
     <AddTeamServerBy>IP</AddTeamServerBy>
+  </TeamServer>
+  <TeamServer>
+    <ID>15</ID>
+    <UserName>TEST</UserName>
+    <PortNumber>2166</PortNumber>
+    <UserType>Existing</UserType>
+    <FullName>TEST</FullName>
+    <Email>TEST@quest.com</Email>
+    <Password>123</Password>
+    <ConfirmPassword>123</ConfirmPassword>
   </TeamServer>
 </NewDataSet>

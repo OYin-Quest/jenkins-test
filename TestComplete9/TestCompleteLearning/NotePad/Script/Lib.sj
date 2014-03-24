@@ -168,3 +168,17 @@ function DumpObject(obj, name)
     Log.Message(name + " : " + obj);
   }
 }
+
+
+// Output dictionary values
+function DumpDictionary(dic)
+{
+  var folder = Log.CreateFolder("Common.DumpDictionary");
+  Log.PushLogFolder(folder);
+  var keys = dic.Keys().toArray();
+  for(var p in keys)
+  {
+    Log.Message("  > " + keys[p] + ":  " + dic.Item(keys[p]));
+  }
+  Log.PopLogFolder();
+}
