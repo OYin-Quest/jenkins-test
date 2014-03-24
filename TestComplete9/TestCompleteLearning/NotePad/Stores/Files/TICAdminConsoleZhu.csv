@@ -1,0 +1,13 @@
+ID,User,ArtifactType,ScriptName,Folder,LastRun,NextRun,Status,Schedule,Managers,Owner,Description,LogCount,Tags,LockedBy,Visibility,CancelRun
+1,root,Automation Scripts,time_stamp_not_run,/auto_script,Never.,Never.,N/A,No Scheduling.,Administrator,Administrator,,0,"<a>auto_script</a>, <a>not_run</a>",,"""Visibility""",
+2,root,Automation Scripts,time_stamp_once_run,/auto_script,Ever.,Never.,Succeeded,No Scheduling.,Administrator,Administrator,,1,"<a>auto_script</a>, <a>once_run</a>",,,
+3,root,Automation Scripts,time_stamp_for_share,/auto_script,Never.,Never.,Succeeded,No Scheduling.,Administrator,Administrator,,,"<a>auto_script</a>, <a>for_share</a>",,,
+,,,,,,,,,,,,,,,,
+4,root,Automation Scripts,time_stamp_once_run,/autoscript_edit,Never.,Disabled,N/A,"Disabled. Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.","Administrator, Linda Zhong",Administrator,,0,,,,
+5,root,Automation Scripts,time_stamp_once_run,/autoscript_edit,Ever.,Never.,Succeeded,Execute once at 02/01/2014 02:30 PM. No Scheduling.,"Administrator, Linda Zhong",Administrator,,2,,,,
+6,root,Automation Scripts,time_stamp_once_run,/autoscript_edit,Ever.,Never.,Succeeded,"Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.","Administrator, Linda Zhong",Administrator,,2,,Administrator,"Shared with Linda Zhong, Alisa You",
+7,root,Automation Scripts,time_stamp_once_run,/autoscript_edit,Ever.,Never.,Succeeded,"Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.","Administrator, Linda Zhong",Administrator,,2,,Not locked,"Shared with Linda Zhong, Alisa You",
+,,,,,,,,,,,,,,,,
+8,root,Automation Scripts,time_stamp_for_share,/auto_script,Ever.,Never.,Succeeded,No Scheduling.,Administrator,Administrator,,,,,,Y
+,,,,,,,,,,,,,,,,
+9,root,Database Diagrams,diagram1,/No folder assigned,,,,,Administrator,Administrator,Linda create diagram1,,,Not locked,Private,

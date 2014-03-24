@@ -1,0 +1,137 @@
+<?xml version="1.0" standalone="yes"?>
+<root>
+  <DataPointArtifact>
+    <ID>1</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_not_run</ScriptName>
+    <Folder>/No folder assigned</Folder>
+    <LastRun>Never.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>N/A</Status>
+    <Schedule>No Scheduling.</Schedule>
+    <Managers>Administrator</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>0</LogCount>
+	<Tags><![CDATA[<a>auto_script</a>, <a>not_run</a>]]></Tags>
+	<Visibility>"Visibility"</Visibility>
+  </DataPointArtifact>
+  <DataPointArtifact>
+    <ID>2</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_once_run</ScriptName>
+    <Folder>/No folder assigned</Folder>
+    <LastRun>Ever.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>No Scheduling.</Schedule>
+    <Managers>Administrator</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>1</LogCount>
+	<Tags><![CDATA[<a>auto_script</a>, <a>once_run</a>]]></Tags>
+  </DataPointArtifact>
+  <DataPointArtifact>
+    <ID>3</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_for_share</ScriptName>
+    <Folder>/No folder assigned</Folder>
+    <LastRun>Never.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>No Scheduling.</Schedule>
+    <Managers>Administrator</Managers>
+    <Owner>Administrator</Owner>
+	<Tags><![CDATA[<a>auto_script</a>, <a>for_share</a>]]></Tags>
+  </DataPointArtifact>
+  <DataPointArtifact />
+  <DataPointArtifact>
+    <ID>4</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_once_run</ScriptName>
+    <Folder>/autoscript_edit</Folder>
+    <LastRun>Never.</LastRun>
+    <NextRun>Disabled</NextRun>
+    <Status>N/A</Status>
+    <Schedule>Disabled. Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.</Schedule>
+    <Managers>Administrator, Linda Zhong</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>0</LogCount>
+  </DataPointArtifact>
+  <DataPointArtifact>
+    <ID>5</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_once_run</ScriptName>
+    <Folder>/autoscript_edit</Folder>
+    <LastRun>Ever.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>Execute once at 02/01/2014 02:30 PM. No Scheduling.</Schedule>
+    <Managers>Administrator, Linda Zhong</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>2</LogCount>
+  </DataPointArtifact>
+  <DataPointArtifact>
+    <ID>6</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_once_run</ScriptName>
+    <Folder>/autoscript_edit</Folder>
+    <LastRun>Ever.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.</Schedule>
+    <Managers>Administrator, Linda Zhong</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>2</LogCount>
+    <LockedBy>Administrator</LockedBy>
+    <Visibility>Shared with Linda, Alisa</Visibility>
+  </DataPointArtifact>
+  <DataPointArtifact>
+    <ID>7</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_once_run</ScriptName>
+    <Folder>/autoscript_edit</Folder>
+    <LastRun>Ever.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.</Schedule>
+    <Managers>Administrator, Linda Zhong</Managers>
+    <Owner>Administrator</Owner>
+    <LogCount>2</LogCount>
+    <LockedBy>Not locked</LockedBy>
+    <Visibility>Shared with Linda, Alisa</Visibility>
+  </DataPointArtifact>
+  <DataPointArtifact />
+  <DataPointArtifact>
+    <ID>8</ID>
+    <User>root</User>
+    <ArtifactType>Automation Scripts</ArtifactType>
+    <ScriptName>time_stamp_for_share</ScriptName>
+    <Folder>/No folder assigned</Folder>
+    <LastRun>Ever.</LastRun>
+    <NextRun>Never.</NextRun>
+    <Status>Succeeded</Status>
+    <Schedule>No Scheduling.</Schedule>
+    <Managers>Administrator</Managers>
+    <Owner>Administrator</Owner>
+    <CancelRun>Y</CancelRun>
+  </DataPointArtifact>
+  <DataPointArtifact />
+  <DataPointArtifact>
+    <ID>9</ID>
+    <User>root</User>
+    <ArtifactType>Database Diagrams</ArtifactType>
+    <ScriptName>diagram1</ScriptName>
+    <Folder>/No folder assigned</Folder>
+    <Managers>Administrator</Managers>
+    <Owner>Administrator</Owner>
+    <Description>Linda create the diagram1</Description>
+    <LockedBy>Not locked</LockedBy>
+    <Visibility>Private</Visibility>
+  </DataPointArtifact>
+</root>
