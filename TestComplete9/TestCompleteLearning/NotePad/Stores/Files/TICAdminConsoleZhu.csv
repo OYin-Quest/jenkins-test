@@ -1,6 +1,6 @@
-id,User,ArtifactType,ScriptName,Folder,LastRun,NextRun,Status,Schedule,Managers,Owner,Description,LogCount,Tags,LockedBy,Visibility,CancelRun
+ID,User,ArtifactType,ScriptName,Folder,LastRun,NextRun,Status,Schedule,Managers,Owner,Description,LogCount,Tags,LockedBy,Visibility,CancelRun
 1,root,Automation Scripts,time_stamp_not_run,/auto_script,Never.,Never.,N/A,No Scheduling.,Administrator,Administrator,,0,"<a>auto_script</a>, <a>not_run</a>",,"""Visibility""",
-2,root,Automation Scripts,time_stamp_once_run,/auto_script,Ever.,Never.,Failed,No Scheduling.,Administrator,Administrator,,2,"<a>auto_script</a>, <a>once_run</a>",,,
+2,root,Automation Scripts,time_stamp_once_run,/auto_script,Ever.,Never.,Succeeded,No Scheduling.,Administrator,Administrator,,1,"<a>auto_script</a>, <a>once_run</a>",,,
 3,root,Automation Scripts,time_stamp_for_share,/auto_script,Never.,Never.,Succeeded,No Scheduling.,Administrator,Administrator,,,"<a>auto_script</a>, <a>for_share</a>",,,
 ,,,,,,,,,,,,,,,,
 4,root,Automation Scripts,time_stamp_once_run,/autoscript_edit,Never.,Disabled,N/A,"Disabled. Start from 15/01/2020, execute script at 03:00 PM every 1 week(s) on Wednesday, Monday.","Administrator, Linda Zhong",Administrator,,0,,,,

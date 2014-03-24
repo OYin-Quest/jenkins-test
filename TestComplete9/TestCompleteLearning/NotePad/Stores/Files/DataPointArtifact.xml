@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <root>
   <DataPointArtifact>
-    <id>1</id>
+    <ID>1</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_not_run</ScriptName>
@@ -17,22 +17,22 @@
 	<Visibility>"Visibility"</Visibility>
   </DataPointArtifact>
   <DataPointArtifact>
-    <id>2</id>
+    <ID>2</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_once_run</ScriptName>
     <Folder>/No folder assigned</Folder>
     <LastRun>Ever.</LastRun>
     <NextRun>Never.</NextRun>
-    <Status>Failed</Status>
+    <Status>Succeeded</Status>
     <Schedule>No Scheduling.</Schedule>
     <Managers>Administrator</Managers>
     <Owner>Administrator</Owner>
-    <LogCount>2</LogCount>
+    <LogCount>1</LogCount>
 	<Tags><![CDATA[<a>auto_script</a>, <a>once_run</a>]]></Tags>
   </DataPointArtifact>
   <DataPointArtifact>
-    <id>3</id>
+    <ID>3</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_for_share</ScriptName>
@@ -47,7 +47,7 @@
   </DataPointArtifact>
   <DataPointArtifact />
   <DataPointArtifact>
-    <id>4</id>
+    <ID>4</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_once_run</ScriptName>
@@ -61,7 +61,7 @@
     <LogCount>0</LogCount>
   </DataPointArtifact>
   <DataPointArtifact>
-    <id>5</id>
+    <ID>5</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_once_run</ScriptName>
@@ -75,7 +75,7 @@
     <LogCount>2</LogCount>
   </DataPointArtifact>
   <DataPointArtifact>
-    <id>6</id>
+    <ID>6</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_once_run</ScriptName>
@@ -91,7 +91,7 @@
     <Visibility>Shared with Linda, Alisa</Visibility>
   </DataPointArtifact>
   <DataPointArtifact>
-    <id>7</id>
+    <ID>7</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_once_run</ScriptName>
@@ -108,7 +108,7 @@
   </DataPointArtifact>
   <DataPointArtifact />
   <DataPointArtifact>
-    <id>8</id>
+    <ID>8</ID>
     <User>root</User>
     <ArtifactType>Automation Scripts</ArtifactType>
     <ScriptName>time_stamp_for_share</ScriptName>
@@ -123,7 +123,7 @@
   </DataPointArtifact>
   <DataPointArtifact />
   <DataPointArtifact>
-    <id>9</id>
+    <ID>9</ID>
     <User>root</User>
     <ArtifactType>Database Diagrams</ArtifactType>
     <ScriptName>diagram1</ScriptName>
