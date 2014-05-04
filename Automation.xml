@@ -439,7 +439,7 @@
 			
 			
 			<echo message="Execute psexec"/>
-			<exec executable="psexec" failonerror="false" timeout="14400000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
+			<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
                    <arg value="\\${FirstVM}"/>
                    <arg value="-n"/>
                    <arg value="60"/>
