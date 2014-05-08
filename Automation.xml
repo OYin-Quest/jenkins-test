@@ -467,11 +467,11 @@
 	    <trycatch property="errormessage">
 	    	<try>
 			    <path id="TestComplete.RawLogInXml.Folder"> 
-		            <fileset dir="${AutomationVM.Automation.dir}/RawResultsInXml" includes="**/Log/**/{*}"/> 
+		            <fileset dir="${AutomationVM.Local.dir}/RawResultsInXml" includes="**/Log/**/{*}"/> 
 		        </path> 
 		        
 		        <path id="TestComplete.ConvertedLogInHtml.Folder"> 
-		            <fileset dir="${AutomationVM.Automation.dir}/Log" includes="**/*"/> 
+		            <fileset dir="${AutomationVM.Local.dir}/Log" includes="**/*"/> 
 		        </path> 
 		        
 		        <property name="TestComplete.RawResultsInXml"  refid="TestComplete.RawLogInXml.Folder"/> 
