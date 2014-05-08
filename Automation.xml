@@ -502,7 +502,7 @@
             <try>
               <!-- Copy the raw TC logs to jenkins test results folder:${Automation.TestResults.dir} -->
               <copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
-                 <fileset dir="${AutomationVM.Automation.dir}">
+                 <fileset dir="${AutomationVM.Local.dir}">
                      <include name="**/Log/**/{*}"/>
                 </fileset>
               </copy>
@@ -511,7 +511,7 @@
            	    <!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
                  <mkdir dir="${Automation.TestResults.dir}/html"/>
                  <copy todir="${Automation.TestResults.dir}/html">
-                      <fileset dir="${AutomationVM.Automation.dir}/log"/>
+                      <fileset dir="${AutomationVM.Local.dir}/log"/>
                  </copy>
 				
 				<!-- Copy support bundle only for SoO. -->	
@@ -519,20 +519,20 @@
 					<if>
 						<equals arg1="${Product.SoO}" arg2="true"/>
 						<then>
-							<echo message="Copying support bundle from ${AutomationVM.Automation.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<echo message="Copying support bundle from ${AutomationVM.Local.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 							<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
 							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-								<fileset dir="${AutomationVM.Automation.dir}/RawResultsInXml/Support"/>
+								<fileset dir="${AutomationVM.Local.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
 					</if>
 					<if>
 						<equals arg1="${Product.TIC}" arg2="true"/>
 						<then>
-							<echo message="Copying support bundle from ${AutomationVM.Automation.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<echo message="Copying support bundle from ${AutomationVM.Local.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 							<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
 							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-								<fileset dir="${AutomationVM.Automation.dir}/RawResultsInXml/Support"/>
+								<fileset dir="${AutomationVM.Local.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
 					</if>   
