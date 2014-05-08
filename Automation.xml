@@ -74,9 +74,13 @@
 	             project.setProperty("SecondVM",VMs[1]);	
              }else if(VMs.length==1){
 			     project.setProperty("FirstVM",VMs[0]);
-			 }		
+			 }
+			 var ProjectPath = ${AutomationVM.Local.dir}.replace(":", "$");
 	    ]]> </script>
 	    <property name="AutomationVM.Automation.dir" value="\\${FirstVM}\C$\Automation"/>
+		<property name="AutomationVM.Project.dir" value="\\${FirstVM}\{ProjectPath}"/>
+		<echo message="Local project path: ${AutomationVM.Local.dir}"/>
+		<echo message="Remote project path: ${AutomationVM.Project.dir}"/>
 	  </then>
 	</if>
 	
@@ -463,15 +467,16 @@
 		    </if>
 	</target>
 	
+	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
 	<target name="ProcessTestCasesResults">
 	    <trycatch property="errormessage">
-	    	<try>
+	    	<try>		
 			    <path id="TestComplete.RawLogInXml.Folder"> 
-		            <fileset dir="${AutomationVM.Local.dir}/RawResultsInXml" includes="**/Log/**/{*}"/> 
+		            <fileset dir="${AutomationVM.Project.dir}/RawResultsInXml" includes="**/Log/**/{*}"/> 
 		        </path> 
 		        
 		        <path id="TestComplete.ConvertedLogInHtml.Folder"> 
-		            <fileset dir="${AutomationVM.Local.dir}/Log" includes="**/*"/> 
+		            <fileset dir="${AutomationVM.Project.dir}/Log" includes="**/*"/> 
 		        </path> 
 		        
 		        <property name="TestComplete.RawResultsInXml"  refid="TestComplete.RawLogInXml.Folder"/> 
@@ -502,7 +507,7 @@
             <try>
               <!-- Copy the raw TC logs to jenkins test results folder:${Automation.TestResults.dir} -->
               <copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
-                 <fileset dir="${AutomationVM.Local.dir}">
+                 <fileset dir="${AutomationVM.Project.dir}">
                      <include name="**/Log/**/{*}"/>
                 </fileset>
               </copy>
@@ -511,7 +516,7 @@
            	    <!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
                  <mkdir dir="${Automation.TestResults.dir}/html"/>
                  <copy todir="${Automation.TestResults.dir}/html">
-                      <fileset dir="${AutomationVM.Local.dir}/log"/>
+                      <fileset dir="${AutomationVM.Project.dir}/log"/>
                  </copy>
 				
 				<!-- Copy support bundle only for SoO. -->	
@@ -519,20 +524,20 @@
 					<if>
 						<equals arg1="${Product.SoO}" arg2="true"/>
 						<then>
-							<echo message="Copying support bundle from ${AutomationVM.Local.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<echo message="Copying support bundle from ${AutomationVM.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 							<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
 							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-								<fileset dir="${AutomationVM.Local.dir}/RawResultsInXml/Support"/>
+								<fileset dir="${AutomationVM.Project.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
 					</if>
 					<if>
 						<equals arg1="${Product.TIC}" arg2="true"/>
 						<then>
-							<echo message="Copying support bundle from ${AutomationVM.Local.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<echo message="Copying support bundle from ${AutomationVM.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 							<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
 							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-								<fileset dir="${AutomationVM.Local.dir}/RawResultsInXml/Support"/>
+								<fileset dir="${AutomationVM.Project.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
 					</if>   
@@ -551,7 +556,7 @@
           </if> 
 	</target>
 
-
+	<!--Remove c:\Automation from test VM-->
 	<target name="DeleteAutomationFilesOnVM">
 		<condition property="AutomationFiles.property.exists" else="false">
 			<and>
@@ -562,11 +567,11 @@
 		<if>
 			<equals arg1="${AutomationFiles.property.exists}" arg2="true"/>
 			<then>
-				<echo message="${AutomationVM.Local.dir} exist!"/>
+				<echo message="${AutomationVM.Automation.dir} exist!"/>
 				<delete includeEmptyDirs="true">
 					<fileset dir="${AutomationVM.Automation.dir}" excludes="NightlyBuild/"/>
 				</delete>
-				<echo message="Delete automation files ${AutomationVM.Local.dir} on VM"/>
+				<echo message="Delete automation files ${AutomationVM.Automation.dir} on VM"/>
 			</then>
 		</if>
 	</target>
