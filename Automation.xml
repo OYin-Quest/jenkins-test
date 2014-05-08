@@ -75,10 +75,11 @@
              }else if(VMs.length==1){
 			     project.setProperty("FirstVM",VMs[0]);
 			 }
-			 var ProjectPath = ${AutomationVM.Local.dir}.replace(":", "$");
+			 var remotePath = project.getProperty("AutomationVM.Local.dir").replace(":", "$");
+			 project.setProperty("ProjectPath", remotePath);
 	    ]]> </script>
 	    <property name="AutomationVM.Automation.dir" value="\\${FirstVM}\C$\Automation"/>
-		<property name="AutomationVM.Project.dir" value="\\${FirstVM}\{ProjectPath}"/>
+		<property name="AutomationVM.Project.dir" value="\\${FirstVM}\${ProjectPath}"/>
 		<echo message="Local project path: ${AutomationVM.Local.dir}"/>
 		<echo message="Remote project path: ${AutomationVM.Project.dir}"/>
 	  </then>
