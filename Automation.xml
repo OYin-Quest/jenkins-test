@@ -50,7 +50,6 @@
 	<if>
 		<equals arg1="${Automation.TestExecutable.set}" arg2="false"/>
 		<then>
-			<echo message="Automation.TestExecutable is not set, will be set to TestExecute by default!"/>
 			<property name="Automation.TestExecutable" value="TestExecute"/>
 		</then>
 	</if>
@@ -59,7 +58,6 @@
 	<condition property="AutomationVM.property.exists" else="false">
         <isset property="AutomationVM"/>
     </condition>
-	<echo message="AutomationVM: ${AutomationVM}"/>
 	
 	<if>
 	  <equals arg1="${AutomationVM.property.exists}" arg2="true"/>
@@ -80,8 +78,6 @@
 	    ]]> </script>
 	    <property name="AutomationVM.Automation.dir" value="\\${FirstVM}\C$\Automation"/>
 		<property name="AutomationVM.Project.dir" value="\\${FirstVM}\${ProjectPath}"/>
-		<echo message="Local project path: ${AutomationVM.Local.dir}"/>
-		<echo message="Remote project path: ${AutomationVM.Project.dir}"/>
 	  </then>
 	</if>
 	
@@ -91,8 +87,12 @@
 		
 		 <echo message="Job WorkSpace is:${JobWorkSpace.dir}"/>
 		 <!--TestOutput-->
-		 <echo message="${BRANCH}"/>
-		 <echo message="${FILE_INSTALLER}"/>
+		 <echo message="Branch=${BRANCH}"/>
+		 <echo message="Installer=${FILE_INSTALLER}"/>
+		 <echo message="AutomationVM=${AutomationVM}"/>
+		 <echo message="TestTool=${Automation.TestExecutable}"/>
+		 <echo message="LocalProjectPath=${AutomationVM.Automation.dir}"/>
+		 <echo message="RemoteProjectPath=${AutomationVM.Project.dir}"/>
 		 
 		 <antcall target="InitJenkinsServerJobWorkSpace"/>
 		 <antcallback target="GetInstallerFileName" return="InstallerFileName"/>
