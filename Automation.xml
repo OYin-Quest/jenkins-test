@@ -517,7 +517,7 @@
            	    <!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
                  <mkdir dir="${Automation.TestResults.dir}/html"/>
                  <copy todir="${Automation.TestResults.dir}/html">
-                      <fileset dir="${AutomationVM.Project.dir}/log"/>
+                      <fileset dir="${AutomationVM.ConvertedLog.dir}"/>
                  </copy>
 				
 				<!-- Copy support bundle only for SoO. -->	
