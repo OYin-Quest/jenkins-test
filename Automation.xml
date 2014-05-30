@@ -75,9 +75,12 @@
 			 }
 			 var remotePath = project.getProperty("AutomationVM.Local.dir").replace(":", "$");
 			 project.setProperty("ProjectPath", remotePath);
+			 var remoteHtmlLogPath = project.getProperty("AutomationVM.ConvertedLog.dir").replace(":", "$");
+			 project.setProperty("HtmlLogPath", remoteHtmlLogPath);
 	    ]]> </script>
 	    <property name="AutomationVM.Automation.dir" value="\\${FirstVM}\C$\Automation"/>
 		<property name="AutomationVM.Project.dir" value="\\${FirstVM}\${ProjectPath}"/>
+		<property name="AutomationVM.HtmlLog.dir" value="\\${FirstVM}\${HtmlLogPath}"/>
 	  </then>
 	</if>
 	
@@ -517,7 +520,7 @@
            	    <!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
                  <mkdir dir="${Automation.TestResults.dir}/html"/>
                  <copy todir="${Automation.TestResults.dir}/html">
-                      <fileset dir="${AutomationVM.ConvertedLog.dir}"/>
+                      <fileset dir="${AutomationVM.HtmlLog.dir}"/>
                  </copy>
 				
 				<!-- Copy support bundle only for SoO. -->	
