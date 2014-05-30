@@ -87,8 +87,8 @@
     
    <!--RunAutomation is main target,it call other target to run-->
 	<target name="RunAutomation"> 
-		
-		 <echo message="Job WorkSpace is:${JobWorkSpace.dir}"/>
+		 <echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
+		 <echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
 		 <!--TestOutput-->
 		 <echo message="Branch=${BRANCH}"/>
 		 <echo message="Installer=${FILE_INSTALLER}"/>
@@ -510,6 +510,7 @@
 		   <trycatch property="errormessage">
             <try>
               <!-- Copy the raw TC logs to jenkins test results folder:${Automation.TestResults.dir} -->
+			  <echo message="Copy TC raw log from ${AutomationVM.Project.dir} to ${Automation.TestResults.dir}"/>
               <copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
                  <fileset dir="${AutomationVM.Project.dir}">
                      <include name="**/Log/**/{*}"/>
@@ -518,6 +519,7 @@
              
                 <!-- Copy the TestComplete converted log for jenkins html publisher folder. -->
            	    <!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+				<echo message="Copy converted html log from ${AutomationVM.HtmlLog.dir} to ${Automation.TestResults.dir}\html"/>
                  <mkdir dir="${Automation.TestResults.dir}/html"/>
                  <copy todir="${Automation.TestResults.dir}/html">
                       <fileset dir="${AutomationVM.HtmlLog.dir}"/>
