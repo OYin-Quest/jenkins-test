@@ -84,7 +84,7 @@
     
    <!--RunAutomation is main target,it call other target to run-->
 	<target name="RunAutomation"> 
-		
+		 <echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
 		 <echo message="Job WorkSpace is:${JobWorkSpace.dir}"/>
 		 
 		 <antcall target="InitJenkinsServerJobWorkSpace"/>
