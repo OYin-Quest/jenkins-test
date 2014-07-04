@@ -168,6 +168,7 @@
 			<arg value="GetLatestBuild"/> 
 			<arg value="${JenkinsServer.ProductInstaller.dir}"/>
 			<arg value="${ProductName}"/>
+			<arg value="${BUILD_BRANCH}"/>
 			<classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
