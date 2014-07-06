@@ -18,7 +18,7 @@
 	  <or>
           <contains string="${ProductName}" substring="TIC"/>
 		  <contains string="${ProductName}" substring="BISuite"/>
-	      <contains string="${ProductName}" substring="TDP"/>
+	      <contains string="${ProductName}" substring="TDECP"/>
 	  </or>
     </condition>
     
