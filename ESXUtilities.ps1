@@ -115,7 +115,7 @@ function RestartVM()
 	
 	if ($G_VM.PowerState -eq "PoweredOff")
 	{
-		StartVM()
+		StartVM
 	}
 	else
 	{
