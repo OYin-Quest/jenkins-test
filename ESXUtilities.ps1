@@ -92,7 +92,6 @@ function StartVM()
 
 function ShutdownVM()
 {
-
   if ($G_VM.PowerState -eq "PoweredOff")
     {
         write-host("$ESX_VM_NAME is already powered off.")
@@ -104,6 +103,27 @@ function ShutdownVM()
 	exit 0
   
 }
+
+function RestartVM()
+{
+	if ($G_VM -eq $null)
+    {
+	    write-host("PowerShell can not find the virtual machine "+$ESX_VM_NAME) 
+        write-host("PowerShell exit 1")
+		exit 1
+    }
+	
+	if ($G_VM.PowerState -eq "PoweredOff")
+	{
+		StartVM()
+	}
+	else
+	{
+		write-host("Begin to restart $ESX_VM_NAME")
+		Restart-VM -VM $G_VM
+	}
+}
+
 function CreatePrebuildSnapshot()
 {    
     write-host("CreatePrebuildSnapshot")
@@ -219,6 +239,7 @@ switch ($args[0])
 {
     "start" { Setup }
 	"stop" { ShutdownVM }
+	"restart" { RestartVM }
     "snapshotfailure" { SnapshotFailure }
 	"deletefailedsnapshots" { DeleteFailedSnapshots }
     "createprebuild" { CreatePrebuildSnapshot }
