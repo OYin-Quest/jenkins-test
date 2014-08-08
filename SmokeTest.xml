@@ -157,9 +157,9 @@
 		<java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
 			<arg value="-jar"/>
 			<arg value="GetLatestBuild"/> 
-			<arg value="${JenkinsServer.ProductInstaller.dir}"/>
-			<arg value="${ProductName}"/>
-			<arg value="${BUILD_BRANCH}"/>
+			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
+			<arg value="productName=${ProductName}"/>
+			<arg value="devBranch=${BUILD_BRANCH}"/>
 			<classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -205,9 +205,9 @@
 	    <java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyInstallerToJenkinsServerResult" outputproperty="CopyInstallerToJenkinsServerOutput">
 		    <arg value="-jar"/>
 		    <arg value="CopyInstallerToJenkinsServer"/> 
-		    <arg value="${FileServer.NightlyBuild.dir}"/>
-			<arg value="${JenkinsServer.ProductInstaller.dir}"/>
-			<arg value="${InstallerFileName}"/>
+		    <arg value="installerDir=${FileServer.NightlyBuild.dir}"/>
+			<arg value="installerToDir=${JenkinsServer.ProductInstaller.dir}"/>
+			<arg value="installerName=${InstallerFileName}"/>
 		    <classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -241,21 +241,30 @@
 			</then>
 		</if>
 		
-		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-		<condition property="InstallerFileName.IsFullName" else="false">
-			  <contains string="${InstallerFileName}" substring=".exe"/>
-		</condition>
-		<if>
-			<equals arg1="${InstallerFileName.IsFullName}" arg2="true"/>
-			<then>
-				<property name ="InstallerFileFullName" value="${InstallerFileName}"/>
-				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileFullName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true"/>
-				<propertyregex property="DisplayInstallerFileName" input="${InstallerFileNameWithSuffix}" regexp=".exe" replace="" global="true"/>
-			</then>
-			<else>
-				<property name="DisplayInstallerFileName" value="${InstallerFileName}"/>
-			</else>
-		</if>
+		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->		
+		<var name="BuildDisplayName" value="${InstallerFileName}"/>
+		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
+		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+		<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
+		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+		<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+		<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
+		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
+		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+		<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
+		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+		<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+		<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
+		<var name="DisplayInstallerFileName" unset="true"/>
+		
+		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
 		
 	   <echo message="Display Build version : ${DisplayInstallerFileName}"/>
 	   <echo message="${JenkinsEnv.JENKINS_URL}"/>
@@ -338,11 +347,11 @@
 		<java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
 		    <arg value="-jar"/>
 		    <arg value="CopyAutomationFilesToVM"/> 
-			<arg value="${JenkinsServer.TCScripts.dir}"/>
-			<arg value="${JenkinsServer.ProductInstaller.dir}"/>
-			<arg value="${AutomationVM.Automation.dir}"/>
-			<arg value="${InstallerFileName}"/>
-			<arg value="${BRANCH}"/>
+			<arg value="testScriptDir=${JenkinsServer.TCScripts.dir}"/>
+			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
+			<arg value="automationDir=${AutomationVM.Automation.dir}"/>
+			<arg value="installerName=${InstallerFileName}"/>
+			<arg value="testBranch=${BRANCH}"/>
 		    <classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
