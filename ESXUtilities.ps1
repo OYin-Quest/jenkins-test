@@ -15,7 +15,6 @@ add-pssnapin vmware.vimautomation.core -ErrorAction:silentlycontinue
 
 function DeletePrebuildSnapshot()
 {
-
    write-host("    Getting prebuild snapshots and delete it")
 
    $lstSnapshots = Get-Snapshot -VM $G_VM 
@@ -29,7 +28,6 @@ function DeletePrebuildSnapshot()
 		}
    }
 }
-
 
 function DeleteFailedSnapshots()
 {
@@ -60,8 +58,7 @@ function StartVM()
     if ($vm -eq $null)
     {
 	    write-host("PowerShell can not find the virtual machine "+$ESX_VM_NAME) 
-        write-host("PowerShell exit 1")
-		exit 1
+		ShellExit 1
     }     
     
 	#If prebuild snapshot is created while the VM is powered on, revert snapshot to prebuild will actuall start the VM to PoweredOn state
@@ -99,9 +96,7 @@ function ShutdownVM()
 	}
 	write-host("Begin to shutdown $ESX_VM_NAME")
 	Stop-Computer -computerName $ESX_VM_NAME -force   
-	write-host("PowerShell exit 0")
-	exit 0
-  
+	ShellExit 0  
 }
 
 function RestartVM()
@@ -109,8 +104,7 @@ function RestartVM()
 	if ($G_VM -eq $null)
     {
 	    write-host("PowerShell can not find the virtual machine "+$ESX_VM_NAME) 
-        write-host("PowerShell exit 1")
-		exit 1
+		ShellExit 1
     }
 	
 	if ($G_VM.PowerState -eq "PoweredOff")
@@ -159,13 +153,12 @@ function RevertSnapshot()
 	else
 	{
 	    write-host("PowerShell can not found prebuild snapshot. Exit 401")
-		exit 401
+		ShellExit 401
 	}
 }
 
 function CheckPoweredOff()
 {
-
     while($True)
 	{
        $G_VM = get-vm -Name $ESX_VM_NAME 
@@ -175,23 +168,21 @@ function CheckPoweredOff()
 			break
 	   
 	   }
-	  
 	   start-sleep -Second 3
 	}
-
 }
+
 function GetVMPoweredStatus()
 {
     $G_VM = get-vm -Name $ESX_VM_NAME 
 	if($G_VM.PowerState -eq "PoweredOff")
 	{
 	   write-host($ESX_VM_NAME+" is in the powered off state")
-	   exit 0
+	   ShellExit 0
 	}else{
 	   write-host($ESX_VM_NAME+" is in the powered on state")
-	   exit 1
+	   ShellExit 1
 	}
-
 }
 
 function Setup()
@@ -200,8 +191,7 @@ function Setup()
     if ($G_VM.PowerState -ne "PoweredOff")
     {
 		write-host($ESX_VM_NAME +" is not in PoweredOff state,please manually check it whether used by another job.")
-		write-host("PowerShell exit 402")
-        exit 402
+        ShellExit 402
 	}
     DeleteFailedSnapshots
     RevertSnapshot
@@ -215,6 +205,12 @@ function SnapshotFailure()
     write-host("Creating failure snapshot " + $SnapshotFailureName)
     
     New-Snapshot -Name $SnapshotFailureName -Memory:$true -VM $ESX_VM_NAME -Server $Server
+}
+
+function ShellExit($returnCode)
+{
+	write-host("PowerShell exit $returnCode")
+	exit $returnCode
 }
 
 # Main entry point
@@ -238,7 +234,7 @@ $G_VM = get-vm -Name $ESX_VM_NAME
 switch ($args[0])
 {
     "start" { Setup }
-	"stop" { ShutdownVM }
+	"shutdown" { ShutdownVM }
 	"restart" { RestartVM }
     "snapshotfailure" { SnapshotFailure }
 	"deletefailedsnapshots" { DeleteFailedSnapshots }
@@ -249,7 +245,6 @@ switch ($args[0])
     "default" { write-host ("Unknown argument: $args[0]") }
 }
 
-write-host("PowerShell exit 0")
-exit 0
+ShellExit 0
 
 
