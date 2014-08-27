@@ -40,9 +40,9 @@
 		</then>
     </if>	
 
-	
-	 <property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	 <property environment="JenkinsEnv"/>
+	 <!-- .Properties file need to use above JenkinsEnv property-->
+	 <property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	
 	<condition property="Automation.TestExecutable.set" else="false">
 		<isset property="Automation.TestExecutable"/>
