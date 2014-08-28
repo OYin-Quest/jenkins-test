@@ -89,14 +89,27 @@ function StartVM()
 
 function ShutdownVM()
 {
-  if ($G_VM.PowerState -eq "PoweredOff")
+	if ($G_VM.PowerState -eq "PoweredOff")
     {
         write-host("$ESX_VM_NAME is already powered off.")
-		return 
+		ShellExit 0 
 	}
-	write-host("Begin to shutdown $ESX_VM_NAME")
-	Stop-Computer -computerName $ESX_VM_NAME -force   
-	ShellExit 0  
+	write-host("Shutting down $ESX_VM_NAME...")
+	Shutdown-VMGuest -VM $G_VM -Confirm:$false
+	
+	for($i=1; $i -le $TimeOut/$SleepTime; $i++)
+	{
+		$G_VM = Get-VM -Name $ESX_VM_NAME
+		write-host($G_VM.PowerState)
+		if ($G_VM.PowerState -eq "PoweredOff")
+		{
+			write-host("$ESX_VM_NAME power off completed.")
+			ShellExit 0
+		}       
+		Start-Sleep -Second $SleepTime         
+	}
+	# If VM is not powered off
+	ShellExit 1
 }
 
 function RestartVM()
