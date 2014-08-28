@@ -40,9 +40,9 @@
 		</then>
     </if>	
 
-	
-	 <property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	 <property environment="JenkinsEnv"/>
+	 <!-- .Properties file need to use above JenkinsEnv property-->
+	 <property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	
 	<condition property="Automation.TestExecutable.set" else="false">
 		<isset property="Automation.TestExecutable"/>
@@ -656,31 +656,18 @@
 	
 	<target name="PowerOffAllAutomationVMOnEsx">
 		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="GetVMPoweredStatus"/>
+			<param name="argCommand" value="shutdown"/>
 			<param name="AutomationExecuteVM" value="${FirstVM}"/>
 		</antcallback>
 		
 		<if>
 			<not>
-			<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
 			</not>
 			<then>
-				<exec executable="psshutdown" failonerror="true" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
-					<arg value="\\${FirstVM}"/>
-					<arg line="-u ${Automation.TestUser} -p ${Automation.TestPassword}"/> 
-					<arg line="-f -t 1"/> 
-				</exec>
-			<if>
-				<not>
-					<equals arg1="${PsexecResultCode}" arg2="0"/>
-				</not>
-				<then>
-					<fail message="Failed to power off ${FirstVM}"/>
-				</then>
-			</if>
+				<fail message="Failed to power off ${FirstVM}"/>
 			</then>
 		</if>
-		
 	</target>
 	
 	<target name="DeletePrebuild">
