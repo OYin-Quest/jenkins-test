@@ -75,9 +75,9 @@
 			<property name="AutomationVM.Project.dir" value="\\${FirstVM}\${ProjectPath}"/>
 			<property name="AutomationVM.HtmlLog.dir" value="\\${FirstVM}\${HtmlLogPath}"/>
 		</then>
-		<else>
-			<fail message="AutomationVM is not set." />
-		</else>
+		<!-- We should not fail job if AutomationVM is not set, 
+			this is because for multi-configuration jobs, the user-defined axis AutomationVM only works for its sub jobs, but not for itself.
+			If we fail job here, then we might see a multi-configuration job fails as 'AutomationVM not set', but with its sub jobs all passed.-->
 	</if>
 
 	<target name="InitJenkinsServerJobWorkSpace">
