@@ -127,6 +127,13 @@
 		</java>
 		<property name ="LatestBuildWithVersion" value="${JenkinsServerLatestBuild}"/>
 		<echo message="Latest Build Version is : ${LatestBuildWithVersion}"/>
+		
+		<if>
+			<equals arg1="${LatestBuildWithVersion}" arg2="Non Exist"/>
+			<then>
+				<fail message="Failed to get latest build for ${ProductName} from ${JenkinsServer.ProductInstaller.dir}!"/>
+			</then>
+		</if> 
 	</target>
 
 	<target name="GetInstallerFileName">
