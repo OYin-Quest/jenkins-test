@@ -119,7 +119,7 @@
 			<arg value="GetLatestBuild"/> 
 			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
 			<arg value="productName=${ProductName}"/>
-			<arg value="devBranch=${BUILD_BRANCH}"/>
+			<arg value="devBranch=${INSTALLER_BRANCH}"/>
 			<classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -137,23 +137,23 @@
 	</target>
 
 	<target name="GetInstallerFileName">
-		<condition property="FILE_INSTALLER.Empty" else="false">
+		<condition property="INSTALLER_NAME.Empty" else="false">
 			<or>
 				<not>
-					<isset property="FILE_INSTALLER"/>
+					<isset property="INSTALLER_NAME"/>
 				</not>	
-				<equals arg1="${FILE_INSTALLER}" arg2=""/>
+				<equals arg1="${INSTALLER_NAME}" arg2=""/>
 			</or>
 		</condition>
 		<if>
-			<equals arg1="${FILE_INSTALLER.Empty}" arg2="true"/>
+			<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
 			<then>
 				<echo message="Call GetLatestBuild targert to get Installler file name"/>
 				<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
 				<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
 			</then>
 			<else>
-				<property name="InstallerFileName" value="${FILE_INSTALLER}"/>
+				<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
 			</else>
 		</if>
 		<echo message="The Installer file name is : ${InstallerFileName}"/>
@@ -351,7 +351,7 @@
 			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
 			<arg value="automationDir=${AutomationVM.Automation.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
-			<arg value="testBranch=${BRANCH}"/>
+			<arg value="testBranch=${TEST_BRANCH}"/>
 			<classpath>
 				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>

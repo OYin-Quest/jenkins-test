@@ -6,8 +6,8 @@
 		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
 		<echo message="Job WorkSpace is:${JobWorkSpace.dir}"/>
 		<!--TestOutput-->
-		<echo message="Branch=${BRANCH}"/>
-		<echo message="Installer=${FILE_INSTALLER}"/>
+		<echo message="TestBranch=${TEST_BRANCH}"/>
+		<echo message="InstallerName=${INSTALLER_NAME}"/>
 		<echo message="AutomationVM=${AutomationVM}"/>
 		<echo message="TestTool=${Automation.TestExecutable}"/>
 		<echo message="LocalProjectPath=${AutomationVM.Automation.dir}"/>
