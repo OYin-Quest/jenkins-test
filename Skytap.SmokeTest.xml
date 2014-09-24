@@ -1,10 +1,10 @@
 <project name="AutomationTesting" basedir="." default="RunAutomation">
-	<import file="test.common.xml" />
+	<import file="Skytap.test.common.xml" />
 
 	<!--Smoke test is running on slave machine, so its steps are different to other regression jobs-->
 	<target name="RunAutomation"> 
 		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
-		<echo message="Job WorkSpace is:${JobWorkSpace.dir}"/>
+		<echo message="Job WorkSpace is: ${JobWorkSpace.dir}"/>
 		<!--TestOutput-->
 		<echo message="TestBranch=${TEST_BRANCH}"/>
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
@@ -16,7 +16,6 @@
 		<antcall target="InitJenkinsServerJobWorkSpace"/>
 		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
 		<antcall target="SetBuildDisplayName"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
-		<antcall target="DeleteFailedSnapshots"/>
 		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults"/>
