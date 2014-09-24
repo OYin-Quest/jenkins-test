@@ -41,7 +41,17 @@
 
 	<property environment="JenkinsEnv"/>
 	<!-- .Properties file need to use above JenkinsEnv property-->
-	<property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
+	<property file="./${SiteCode}/Skytap_Build_${ProductFamily}.Properties"/>
+
+	<if>
+		<contains string="${ProductName}" substring="TDECP"/>
+		<then>
+			<property name="JenkinsServer.ProductInstaller.dir" value="${FileServer.Artifact.dir}\DecisionPoint"/>
+		</then>
+		<else>
+			<property name="JenkinsServer.ProductInstaller.dir" value="${FileServer.Artifact.dir}\BISuite"/>
+		</else>
+	</if>
 
 	<if>
 		<not>
@@ -247,99 +257,6 @@
 		</java>
 		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
 	</target>
-
-	<target name="StartVMToPrebuild">
-		<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
-		<!-- check whether need start second VM for upgrade remote test -->
-		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
-			<then>
-				<echo message="Start Second VM for upgrade remote tests."/>
-				<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-					<param name="argCommand" value="start"/>
-					<param name="AutomationExecuteVM" value="${SecondVM}"/>
-				</antcallback>
-				<if>
-					<not>
-						<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-					</not>
-					<then>
-						<fail message="Jenkins job stoped because automation VM can not start."/>
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<echo message="Start Automation VM."/>
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="start"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Jenkins job stoped because automation VM can not start.Please manually check the status of following vm:${AutomationVM} ${SecondVM}"/>
-			</then>
-		</if>
-		<echo message="execute ipconfig /flushdns on jenkins server."/>
-		<exec executable="cmd">
-			<arg value="/c" />
-			<arg value="ipconfig" />
-			<arg value="/flushdns" />
-		</exec>
-	</target>
-
-	<target name="DeleteFailedSnapshots">
-		<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
-		<!-- check whether need start second VM for upgrade remote test -->
-		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
-			<then>
-				<echo message="Start Second VM for upgrade remote tests."/>
-				<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-					<param name="argCommand" value="deletefailedsnapshots"/>
-					<param name="AutomationExecuteVM" value="${SecondVM}"/>
-				</antcallback>
-				<if>
-					<not>
-						<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-					</not>
-					<then>
-						<fail message="Failed to remove snapshot from test VM ${SecondVM}"/>
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<echo message="Delete Failed Snapshots."/>
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="deletefailedsnapshots"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Failed to remove snapshot from test VM ${FirstVM}"/>
-			</then>
-		</if>
-	</target>
 	
 	<target name="CopyAutomationFilesToVM">
 		<echo message="Wait 120 seconds for creating folder: ${AutomationVM.Automation.dir}"/>
@@ -365,8 +282,6 @@
 				<equals arg1="${CopyAutomationFilesToVMResult}" arg2="0"/>
 			</not>
 			<then>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
-				<antcall target="PowerOffVM"/>
 				<fail message="Cannot copy latest build version from ${FileServer.NightlyBuild.dir} to ${JenkinsServer.TCScripts.dir} and ${JenkinsServer.ProductInstaller.dir}. Jenkins job will stop!"/>
 			</then>
 		</if> 
@@ -424,7 +339,6 @@
 			</not>
 			<then>
 				<echo message="Calling TakeFailedSnapshotOnVM."/>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
 			</then>
 		</if>
 	</target>
@@ -536,103 +450,10 @@
 		</if>
 	</target>
 
-	<target name="PowerOffVM">
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
-		<!-- check whether need shut down second VM for upgrade remote test -->
-		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
-			<then>
-				<echo message="Shut down Second VM:${SecondVM}"/>
-				<antcall target="PowerOffAllAutomationVMOnEsx">
-					<param name="FirstVM" value="${SecondVM}"/>
-				</antcall>
-			</then>
-		</if>
-		<echo message="Shut down the Automation VM:${FirstVM}"/>
-
-		<antcall target="PowerOffAllAutomationVMOnEsx"/>	 
-	</target>
-
-	<target name="TakeFailedSnapshotOnVM">
-		<echo message="Calling ExecuteEsxCommand."/>
-		<antcall target="ExecuteEsxCommand">
-			<param name="argCommand" value="snapshotfailure"/>
-			<param name="AutomationExecuteVM" value="${AutomationVM}"/>
-		</antcall>
-	</target>
-
-	<target name="ExecuteEsxCommand">
-		<echo message="================================================"/>
-		<echo message="argCommand    ${argCommand}" />
-		<echo message="AutomationVM  ${AutomationExecuteVM}"/>
-		<echo message="ESX_NAME      ${ESX_NAME}"/>
-		<echo message="ESX_USERNAME  ${ESX_USERNAME}"/>
-		<echo message="ESX_PASSWORD  ${ESX_PASSWORD}"/>	
-		<echo message="================================================"/>
-		<exec dir="${JenkinsServer.AntScripts.dir}" executable="powershell" failonerror="false" errorproperty="ErrorMessage" resultproperty="PowerShellErrorCode">
-			<arg value="-File"/>
-			<arg value="ESXUtilities.ps1"/>
-			<arg value="${argCommand}"/>
-			<arg value="${AutomationExecuteVM}"/>
-			<arg value="${ESX_NAME}"/>
-			<arg value="${ESX_USERNAME}"/>
-			<arg value="${ESX_PASSWORD}"/>   
-		</exec>
-
-		<echo message="${ErrorMessage}"/>
-		<property name="EsxCommandReturnCode" value="${PowerShellErrorCode}"/>
-	</target>
-
 	<target name="CleanProductInstaller">
 		<echo message="Cleaning old product version:${JenkinsServer.ProductInstaller.dir}."/>
 		<delete includeemptydirs="true">
 			<fileset dir="${JenkinsServer.ProductInstaller.dir}" includes="**/*"/>
 		</delete>
-	</target>
-
-	<target name="PowerOffAllAutomationVMOnEsx">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="shutdown"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Failed to power off ${FirstVM}"/>
-			</then>
-		</if>
-	</target>
-
-	<target name="DeletePrebuild">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="deleteprebuild"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-	</target>
-
-	<target name="CreatePrebuild">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="createprebuild"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-	</target>
-
-	<target name="ExecuteWindowsUpdate">
-		<antcall target="StartVMToPrebuild"/>
-		<echo message="wait 8 hours for windows updating......."/>
-		<sleep seconds="28800"/>
-		<echo message="Windows Updates finished,need power off to create new snapshot"/>
-		<antcall target="PowerOffAllAutomationVMOnEsx"/>
-		<echo message="Deleting older prebuild snapshot..."/>
-		<antcall target="DeletePrebuild"/>
-		<echo message="Creating new prebuild snapshot...."/>
-		<antcall target="CreatePrebuild"/>
 	</target>
 </project>
