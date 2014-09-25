@@ -5,6 +5,9 @@
 	<target name="RunAutomation"> 
 		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
 		<echo message="Job WorkSpace is: ${JobWorkSpace.dir}"/>
+		<echo message="JenkinsServer.AntUtilities.dir is: ${JenkinsServer.AntUtilities.dir}" />
+		<echo message="JenkinsServer.AntScripts.dir is: ${JenkinsServer.AntScripts.dir}" />
+		<echo message="JenkinsServer.ProductInstaller.dir is: ${JenkinsServer.ProductInstaller.dir}" />
 		<!--TestOutput-->
 		<echo message="TestBranch=${TEST_BRANCH}"/>
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
