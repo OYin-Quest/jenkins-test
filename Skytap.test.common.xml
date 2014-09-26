@@ -238,23 +238,23 @@
 		<property name="TestParameterSet" value="&quot;${TestParameters},SITE_CODE=${SiteCode}&quot;"/>
 		
 		<echo message="-----------------Basic information------------------------------"/>
-		<echo>AutomationVM:							${FirstVM}</echo>
-		<echo>Automation.Local.dir:					${Automation.Local.dir}</echo>
-		<echo>Automation TestUser:					${Automation.TestUser}</echo>
-		<echo>Automation TestPassword:				${Automation.TestPassword}</echo>
-		<echo>Automation TestExecutable:			${Automation.TestExecutable}</echo>
-		<echo>Automation ProjectSuit:				${Automation.pjs}</echo>
-		<echo>Automation TestParameters:			${TestParameterSet}</echo>
+		<echo>AutomationVM:                         ${AutomationVM}</echo>
+		<echo>Automation.Project.dir:               ${Automation.Project.dir}</echo>
+		<echo>Automation TestUser:                  ${Automation.TestUser}</echo>
+		<echo>Automation TestPassword:              ${Automation.TestPassword}</echo>
+		<echo>Automation TestExecutable:            ${Automation.TestExecutable}</echo>
+		<echo>Automation ProjectSuit:               ${Automation.pjs}</echo>
+		<echo>Automation TestParameters:            ${TestParameterSet}</echo>
 		<echo message="------------------------------------------------------------------"/>
-		<echo message="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
+		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
 		<echo message="Execute psexec to run automation tests..."/>
 		<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
-			<arg value="\\${FirstVM}"/>
+			<arg value="\\${AutomationVM}"/>
 			<arg value="-n"/>
 			<arg value="60"/>
 			<arg line="-u ${Automation.TestUser} -p ${Automation.TestPassword}"/> 
 			<arg line="-i -h wscript"/>
-			<arg line="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
+			<arg line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
 		</exec>
 		<echo message="===================PsexecOutput=========================="/>
 		<echo message="${PsexecOutput}"/>
@@ -276,9 +276,9 @@
 		<trycatch property="errormessage">
 			<try>
 				<!-- Copy the raw automation logs to a folder under job workspace. -->
-				<echo message="Copy automation raw log from ${Automation.Local.dir} to ${Automation.TestResults.dir}"/>
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
 				<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
-					<fileset dir="${Automation.Local.dir}">
+					<fileset dir="${Automation.Project.dir}">
 						<include name="**/Log/**/{*}"/>
 					</fileset>
 				</copy>
@@ -294,9 +294,9 @@
 				<if>
 					<equals arg1="${Product.TIC}" arg2="true"/>
 					<then>
-						<echo message="Copying support bundle from ${Automation.Local.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 						<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-							<fileset dir="${Automation.Local.dir}/RawResultsInXml/Support"/>
+							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
 				</if>   
@@ -317,9 +317,9 @@
 	<target name="DeleteAutomationFilesOnVM">
 		<trycatch property="delErrMsg">
 			<try>
-				<echo message="Delete automation files ${Automation.Local.dir} on VM"/>
+				<echo message="Delete automation files ${Automation.Project.dir} on VM"/>
 				<delete includeEmptyDirs="true">
-					<fileset dir="${Automation.Local.dir}" excludes="NightlyBuild/"/>
+					<fileset dir="${Automation.Project.dir}" excludes="NightlyBuild/"/>
 				</delete>
 			</try>
 			<catch>
