@@ -61,7 +61,7 @@
 		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
 			<arg value="-jar"/>
 			<arg value="GetLatestBuild"/> 
-			<arg value="installerDir=${Automation.ProductInstaller.dir}"/>
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
 			<arg value="productName=${ProductName}"/>
 			<arg value="devBranch=${INSTALLER_BRANCH}"/>
 			<classpath>
@@ -75,7 +75,7 @@
 		<if>
 			<equals arg1="${LatestBuildWithVersion}" arg2="Non Exist"/>
 			<then>
-				<fail message="Failed to get latest build for ${ProductName} from ${Automation.ProductInstaller.dir}!"/>
+				<fail message="Failed to get latest build for ${ProductName} from ${FileServer.ProductInstaller.dir}!"/>
 			</then>
 		</if> 
 	</target>
@@ -108,33 +108,6 @@
 			</then>
 		</if>
 		<echo message="The Installer file name is : ${InstallerFileName}"/>
-	</target>
-
-	<target name="CopyInstaller">
-		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
-		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyInstallerToJenkinsServerResult" outputproperty="CopyInstallerToJenkinsServerOutput">
-			<arg value="-jar"/>
-			<arg value="CopyInstaller"/> 
-			<arg value="installerDir=${FileServer.NightlyBuild.dir}"/>
-			<arg value="installerToDir=${Automation.ProductInstaller.dir}"/>
-			<arg value="installerName=${InstallerFileName}"/>
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-
-		<echo message="CopyInstallerToJenkinsServerResult: ${CopyInstallerToJenkinsServerResult}"/>
-		<echo message="CopyInstallerToJenkinsServerOutput: ${CopyInstallerToJenkinsServerOutput}"/>
-
-		<if>
-			<not>
-				<equals arg1="${CopyInstallerToJenkinsServerResult}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Cannot copy latest build version from ${FileServer.NightlyBuild.dir} to ${Automation.ProductInstaller.dir}. Jenkins job will stop!"/>
-			</then>
-		</if> 
 	</target>
 
 	<target name="SetBuildDisplayName">
@@ -204,7 +177,7 @@
 			<arg value="-jar"/>
 			<arg value="CopyAutomationFilesToVM"/> 
 			<arg value="testScriptDir=${Automation.TCScripts.dir}"/>
-			<arg value="installerDir=${Automation.ProductInstaller.dir}"/>
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
 			<arg value="automationDir=${Automation.Project.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
 			<arg value="testBranch=${TEST_BRANCH}"/>
@@ -221,7 +194,7 @@
 				<equals arg1="${CopyAutomationFilesToVMResult}" arg2="0"/>
 			</not>
 			<then>
-				<fail message="Cannot copy latest build version from ${FileServer.NightlyBuild.dir} to ${JenkinsServer.TCScripts.dir} and ${JenkinsServer.ProductInstaller.dir}. Jenkins job will stop!"/>
+				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Project.dir}. Jenkins job will stop!"/>
 			</then>
 		</if> 
 	</target>
@@ -305,8 +278,8 @@
 				<echo message="${errormessage}"/>
 			</catch>
 			<finally>
-				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkind to determine the job status. -->
-				<exec executable="${JenkinsServer.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
+				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
 					<arg value="${Automation.TestResults.dir}"/>
 				</exec>
 			</finally>
