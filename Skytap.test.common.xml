@@ -43,7 +43,7 @@
 	<property name="Automation.TestExecutable" value="TestExecute"/>
 	<property name="AutomationVM" value="${JenkinsEnv.COMPUTERNAME}"/>
 
-	<target name="InitJobWorkSpace">
+	<target name="InitJenkinsServerJobWorkSpace">
 		<tstamp>
 			<format property="TimeLogging" pattern="MM-dd-yyyy_HH-mm-ss" locale="en"/>
 		</tstamp>
