@@ -10,8 +10,7 @@
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
 		<echo message="AutomationVM=${AutomationVM}"/>
 		<echo message="TestTool=${Automation.TestExecutable}"/>
-		<echo message="LocalProjectPath=${AutomationVM.Automation.dir}"/>
-		<echo message="RemoteProjectPath=${AutomationVM.Project.dir}"/>
+		<echo message="ProjectPath=${Automation.Project.dir}"/>
 
 		<antcall target="InitJenkinsServerJobWorkSpace"/>
 		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
