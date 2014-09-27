@@ -248,7 +248,7 @@
 					<!--Don't start VM to prebuild if job says NO-->
 					<not>
 						<equals arg1="${StartVMToPrebuild}" arg2="false"/>
-					<not>
+					</not>
 					<then>
 						<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
 						<!-- check whether need start second VM for upgrade remote test -->
