@@ -77,19 +77,8 @@
 		</not>
 	</condition>
 	
-	<!--Skytap uses a different copy of .properties-->
-	<if>
-		<istrue value="${domain.prod}"/>
-		<then>
-			<property name="Build.Property" value="Build_${ProductFamily}"/>
-		</then>
-		<else>
-			<property name="Build.Property" value="Skytap_Build_${ProductFamily}"/>
-		</else>
-	</if>
-	
 	<!-- .Properties file need to use above JenkinsEnv property-->
-	<property file="./${SiteCode}/${Build.Property}.Properties"/>
+	<property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	
 	<target name="EchoAntProperty">
 		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
@@ -104,6 +93,8 @@
 		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
 		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
 		<echo message="Test.Domain=${Test.Domain}"/>
+		<echo message="domain.prod=${domain.prod}" />
+		<echo message="ProductFamily=${ProductFamily}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
