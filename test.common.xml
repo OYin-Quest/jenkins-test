@@ -2,25 +2,17 @@
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
-	<condition property="Product.SoSSE" else="false">
-		<or>
-			<contains string="${ProductName}" substring="SoSSE"/>
-			<contains string="${ProductName}" substring="SoSS"/>
-		</or>
-	</condition>
-
-	<condition property="Product.SoO" else="false">
-		<contains string="${ProductName}" substring="SoO"/>
-	</condition>
-
 	<condition property="Product.TIC" else="false">
 		<or>
 			<contains string="${ProductName}" substring="TIC"/>
 			<contains string="${ProductName}" substring="BISuite"/>
-			<contains string="${ProductName}" substring="TDECP"/>
 		</or>
 	</condition>
 
+	<condition property="Product.TDECP" else="false">
+		<contains string="${ProductName}" substring="TDECP"/>
+	</condition>
+	
 	<condition property="Product.DataPoint" else="false">
 		<contains string="${ProductName}" substring="DataPoint"/>
 	</condition>
@@ -30,27 +22,22 @@
 		<then>
 			<property name="ProductFamily" value="TIC"/>
 		</then>
+		<elseif>
+			<equals arg1="${Product.DataPoint}" arg2="true"/>
+			<then>
+				<property name="ProductFamily" value="DataPoint"/>
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${Product.TDECP}" arg2="true"/>
+			<then>
+				<property name="ProductFamily" value="TDECP"/>
+			</then>
+		</elseif>
 	</if>
-
-	<if>
-		<equals arg1="${Product.DataPoint}" arg2="true"/>
-		<then>
-			<property name="ProductFamily" value="DataPoint"/>
-		</then>
-	</if>	
 
 	<property environment="JenkinsEnv"/>
-	<!-- .Properties file need to use above JenkinsEnv property-->
-	<property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
-
-	<if>
-		<not>
-			<isset property="Automation.TestExecutable"/>
-		</not>
-		<then>
-			<property name="Automation.TestExecutable" value="TestExecute"/>
-		</then>
-	</if>
+	<property name="Automation.TestExecutable" value="TestExecute"/>
 
 	<!-- Check whether AutomationVM property exists-->
 	<if>
@@ -66,62 +53,82 @@
 			}else if(VMs.length==1){
 				project.setProperty("FirstVM",VMs[0]);
 			}
-			var remotePath = project.getProperty("AutomationVM.Local.dir").replace(":", "$");
-			project.setProperty("ProjectPath", remotePath);
-			var remoteHtmlLogPath = project.getProperty("AutomationVM.ConvertedLog.dir").replace(":", "$");
-			project.setProperty("HtmlLogPath", remoteHtmlLogPath);
 			]]> </script>
-			<property name="AutomationVM.Automation.dir" value="\\${FirstVM}\C$\Automation"/>
-			<property name="AutomationVM.Project.dir" value="\\${FirstVM}\${ProjectPath}"/>
-			<property name="AutomationVM.HtmlLog.dir" value="\\${FirstVM}\${HtmlLogPath}"/>
 		</then>
 		<!-- We should not fail job if AutomationVM is not set, 
 			this is because for multi-configuration jobs, the user-defined axis AutomationVM only works for its sub jobs, but not for itself.
 			If we fail job here, then we might see a multi-configuration job fails as 'AutomationVM not set', but with its sub jobs all passed.-->
+		<else>
+			<if>
+				<not>
+					<equals arg1="${JenkinsEnv.NODE_NAME}" arg2="master" />
+				</not>
+				<then>
+					<property name="FirstVM" value="${JenkinsEnv.COMPUTERNAME}" />
+				</then>
+			</if>
+		</else>
 	</if>
-
+	
+	<!--Test.Domain is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
+	<condition property="domain.prod">
+		<not>
+			<equals arg1="${Test.Domain}" arg2="skytap"/>
+		</not>
+	</condition>
+	
+	<!--Skytap uses a different copy of .properties-->
+	<if>
+		<istrue value="${domain.prod}"/>
+		<then>
+			<property name="Build.Property" value="Build_${ProductFamily}"/>
+		</then>
+		<else>
+			<property name="Build.Property" value="Skytap_Build_${ProductFamily}"/>
+		</else>
+	</if>
+	
+	<!-- .Properties file need to use above JenkinsEnv property-->
+	<property file="./${SiteCode}/${Build.Property}.Properties"/>
+	
+	<target name="EchoAntProperty">
+		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
+		<echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
+		<echo message="TestBranch=${TEST_BRANCH}"/>
+		<echo message="InstallerName=${INSTALLER_NAME}"/>
+		<echo message="AutomationVM=${AutomationVM}"/>
+		<echo message="TestTool=${Automation.TestExecutable}"/>
+		<echo message="Automation.AntUtilities.Dir=${Automation.AntUtilities.dir}"/>
+		<echo message="Automation.AntScripts.dir=${Automation.AntScripts.dir}"/>
+		<echo message="Automation.TCScripts.dir=${Automation.TCScripts.dir}"/>
+		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
+		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
+		<echo message="Test.Domain=${Test.Domain}"/>
+	</target>
+	
 	<target name="InitJenkinsServerJobWorkSpace">
-		<tstamp>
-			<format property="TimeLogging" pattern="MM-dd-yyyy_HH-mm-ss" locale="en"/>
-		</tstamp>
-
-		<tstamp>
-			<format property="CopyrightYear" pattern="yyyy" locale="en"/>
-		</tstamp>
-
-		<tstamp>
-			<format property="BuildStartTime" pattern="MM/dd/yyyy HH:mm:ss" locale="en"/>
-		</tstamp>
-		<condition property="JobWorkSpace.dir.exists" else="false">
-			<available file="${Automation.TestResults.dir}" type="dir"/>
-		</condition>
-		<echo message="${Automation.TestResults.dir}"/>
-		<echo message="${Automation.TestLogs.dir}"/>
-		<echo message="JobWorkSpace.dir.exists:${JobWorkSpace.dir.exists}"/>
-		<if>
-			<equals arg1="${JobWorkSpace.dir.exists}" arg2="false"/>
-			<then>
-				<echo message="Creating Automation.TestResults.dir and Automation.TestLogs.dir"/>
-				<mkdir dir="${Automation.TestResults.dir}"/>
-			</then>
-			<else>
-				<echo message="Deleting Automation.TestResults.dir:${Automation.TestResults.dir}"/>
+		<trycatch property="Msg.DeleteTestResult">
+			<try>
+				<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
 				<delete includeemptydirs="true">
 					<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
 				</delete>
-			</else>
-		</if>
+			</try>
+			<catch>
+				<echo message="${Msg.DeleteTestResult}" />
+			</catch>
+		</trycatch>
 	</target>
 
 	<target name="GetLatestBuild">
-		<java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
+		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
 			<arg value="-jar"/>
 			<arg value="GetLatestBuild"/> 
-			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
 			<arg value="productName=${ProductName}"/>
 			<arg value="devBranch=${INSTALLER_BRANCH}"/>
 			<classpath>
-				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
+				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
 			</classpath>
 		</java>
@@ -131,59 +138,39 @@
 		<if>
 			<equals arg1="${LatestBuildWithVersion}" arg2="Non Exist"/>
 			<then>
-				<fail message="Failed to get latest build for ${ProductName} from ${JenkinsServer.ProductInstaller.dir}!"/>
+				<fail message="Failed to get latest build for ${ProductName} from ${FileServer.ProductInstaller.dir}!"/>
 			</then>
 		</if> 
 	</target>
 
 	<target name="GetInstallerFileName">
-		<condition property="INSTALLER_NAME.Empty" else="false">
-			<or>
-				<not>
-					<isset property="INSTALLER_NAME"/>
-				</not>	
-				<equals arg1="${INSTALLER_NAME}" arg2=""/>
-			</or>
-		</condition>
-		<if>
-			<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
-			<then>
-				<echo message="Call GetLatestBuild targert to get Installler file name"/>
-				<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
-				<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
-			</then>
-			<else>
-				<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
-			</else>
-		</if>
-		<echo message="The Installer file name is : ${InstallerFileName}"/>
-	</target>
-
-	<target name="CopyInstallerToJenkinsServer">
-		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
-		<java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyInstallerToJenkinsServerResult" outputproperty="CopyInstallerToJenkinsServerOutput">
-			<arg value="-jar"/>
-			<arg value="CopyInstallerToJenkinsServer"/> 
-			<arg value="installerDir=${FileServer.NightlyBuild.dir}"/>
-			<arg value="installerToDir=${JenkinsServer.ProductInstaller.dir}"/>
-			<arg value="installerName=${InstallerFileName}"/>
-			<classpath>
-				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-
-		<echo message="CopyInstallerToJenkinsServer: ${CopyInstallerToJenkinsServerResult}"/>
-		<echo message="CopyInstallerToJenkinsServer: ${CopyInstallerToJenkinsServerOutput}"/>
-
 		<if>
 			<not>
-				<equals arg1="${CopyInstallerToJenkinsServerResult}" arg2="0"/>
+				<isset property="InstallerFileName"/>
 			</not>
 			<then>
-				<fail message="Cannot copy latest build version from ${FileServer.NightlyBuild.dir} to ${JenkinsServer.ProductInstaller.dir}. Jenkins job will stop!"/>
+				<condition property="INSTALLER_NAME.Empty" else="false">
+					<or>
+						<not>
+							<isset property="INSTALLER_NAME"/>
+						</not>	
+						<equals arg1="${INSTALLER_NAME}" arg2=""/>
+					</or>
+				</condition>
+				<if>
+					<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
+					<then>
+						<echo message="Call GetLatestBuild targert to get Installler file name"/>
+						<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
+						<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
+					</then>
+					<else>
+						<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
+					</else>
+				</if>
 			</then>
-		</if> 
+		</if>
+		<echo message="The Installer file name is : ${InstallerFileName}"/>
 	</target>
 
 	<target name="SetBuildDisplayName">
@@ -229,7 +216,7 @@
 		<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
 		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
 
-		<java jar="${JenkinsServer.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+		<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
 			<arg value="-s"/> 
 			<arg line="${JenkinsEnv.JENKINS_URL}"/>
 			<arg value="set-build-display-name"/>
@@ -241,73 +228,81 @@
 			<arg line="password"/>
 			<arg line="${JenkinsServer.Password}"/-->
 			<classpath>
-				<pathelement location="${JenkinsServer.AntUtilities.dir}/jenkins-cli.jar"/>
+				<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
 				<pathelement path="${java.class.path}"/>
 			</classpath>
 		</java>
 		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
 	</target>
 
-	<target name="StartVMToPrebuild">
-		<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
-		<!-- check whether need start second VM for upgrade remote test -->
+	<!--This target for automation which is running in ESX VM, and not for smoke test which is running on slave-->
+	<target name="StartVMToPrebuild" if="domain.prod">
 		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
+			<!--For smoke test running on slave VM. The VM keeps on-line all the time, no need to start, just delete snapshot for it.-->
+			<equals arg1="${Test.Type}" arg2="smoke"/>
 			<then>
-				<echo message="Start Second VM for upgrade remote tests."/>
-				<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-					<param name="argCommand" value="start"/>
-					<param name="AutomationExecuteVM" value="${SecondVM}"/>
-				</antcallback>
+				<antcall target="DeleteFailedSnapshots"/>
+			</then>
+			<else>
 				<if>
+					<!--Don't start VM to prebuild if job says NO-->
 					<not>
-						<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+						<equals arg1="${StartVMToPrebuild}" arg2="false"/>
 					</not>
 					<then>
-						<fail message="Jenkins job stoped because automation VM can not start."/>
+						<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
+						<!-- check whether need start second VM for upgrade remote test -->
+						<if>
+							<isset property="SecondVM"/>
+							<then>
+								<echo message="Start Second VM for upgrade remote tests."/>
+								<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+									<param name="argCommand" value="start"/>
+									<param name="AutomationExecuteVM" value="${SecondVM}"/>
+								</antcallback>
+								<if>
+									<not>
+										<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+									</not>
+									<then>
+										<fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
+									</then>
+								</if>
+							</then>
+						</if>
+						<!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
+						<echo message="Start Automation VM."/>
+						<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+							<param name="argCommand" value="start"/>
+							<param name="AutomationExecuteVM" value="${FirstVM}"/>
+						</antcallback>
+
+						<if>
+							<not>
+								<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+							</not>
+							<then>
+								<fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
+							</then>
+						</if>
+						<!--Why need this ipconfig & flushdns?-->
+						<echo message="execute ipconfig /flushdns on jenkins server."/>
+						<exec executable="cmd">
+							<arg value="/c" />
+							<arg value="ipconfig" />
+							<arg value="/flushdns" />
+						</exec>
 					</then>
 				</if>
-			</then>
+			</else>
 		</if>
-
-		<echo message="Start Automation VM."/>
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="start"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Jenkins job stoped because automation VM can not start.Please manually check the status of following vm:${AutomationVM} ${SecondVM}"/>
-			</then>
-		</if>
-		<echo message="execute ipconfig /flushdns on jenkins server."/>
-		<exec executable="cmd">
-			<arg value="/c" />
-			<arg value="ipconfig" />
-			<arg value="/flushdns" />
-		</exec>
 	</target>
 
-	<target name="DeleteFailedSnapshots">
+	<target name="DeleteFailedSnapshots" if="domain.prod">
 		<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
 		<!-- check whether need start second VM for upgrade remote test -->
 		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
+			<isset property="SecondVM"/>
 			<then>
 				<echo message="Start Second VM for upgrade remote tests."/>
 				<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
@@ -342,18 +337,16 @@
 	</target>
 	
 	<target name="CopyAutomationFilesToVM">
-		<echo message="Wait 120 seconds for creating folder: ${AutomationVM.Automation.dir}"/>
-		<sleep seconds="120"/>
-		<java jar="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
+		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
 			<arg value="-jar"/>
 			<arg value="CopyAutomationFilesToVM"/> 
-			<arg value="testScriptDir=${JenkinsServer.TCScripts.dir}"/>
-			<arg value="installerDir=${JenkinsServer.ProductInstaller.dir}"/>
-			<arg value="automationDir=${AutomationVM.Automation.dir}"/>
+			<arg value="testScriptDir=${Automation.TCScripts.dir}"/>
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
+			<arg value="automationDir=${Automation.Work.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
 			<arg value="testBranch=${TEST_BRANCH}"/>
 			<classpath>
-				<pathelement location="${JenkinsServer.AntUtilities.dir}/JenkinsFileUtils.jar"/>
+				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
 			</classpath>
 		</java>
@@ -367,7 +360,7 @@
 			<then>
 				<antcall target= "TakeFailedSnapshotOnVM"/>
 				<antcall target="PowerOffVM"/>
-				<fail message="Cannot copy latest build version from ${FileServer.NightlyBuild.dir} to ${JenkinsServer.TCScripts.dir} and ${JenkinsServer.ProductInstaller.dir}. Jenkins job will stop!"/>
+				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
 			</then>
 		</if> 
 	</target>
@@ -379,14 +372,9 @@
 		<echo message="if wscript returns 2,it means testcase run failed!"/>
 		<echo message="if wscript returns 1000,it means Testcomplete was already running and testcomplete can not open the project."/>
 		<echo message="-----------------------------------------------------------------"/>
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
 		<!-- check whether need start second VM for upgrade remote test -->
 		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
+			<isset property="SecondVM"/>
 			<then>
 				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},SITE_CODE=${SiteCode}&quot;"/>
 			</then>
@@ -396,14 +384,14 @@
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
 		<echo>AutomationVM:                           ${FirstVM}</echo>
-		<echo>AutomationVM.Automation.dir :           ${AutomationVM.Automation.dir}</echo>
+		<echo>Automation.Project.dir :                ${Automation.Project.dir}</echo>
 		<echo>Automation TestUser:                    ${Automation.TestUser}</echo>
 		<echo>Automation TestPassword:                ${Automation.TestPassword}</echo>
 		<echo>Automation TestExecutable:              ${Automation.TestExecutable}</echo>
 		<echo>Automation ProjectSuit:                 ${Automation.pjs}</echo>
 		<echo>Automation TestParameters:              ${TestParameterSet}</echo>
 		<echo message="------------------------------------------------------------------"/>
-		<echo message="${AutomationVM.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${AutomationVM.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute psexec to run automation tests..."/>
 		<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
 			<arg value="\\${FirstVM}"/>
@@ -411,7 +399,7 @@
 			<arg value="60"/>
 			<arg line="-u ${Automation.TestUser} -p ${Automation.TestPassword}"/> 
 			<arg line="-i -h wscript"/>
-			<arg line="${AutomationVM.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${AutomationVM.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
+			<arg line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
 		</exec>
 		<echo message="===================PsexecOutput=========================="/>
 		<echo message="${PsexecOutput}"/>
@@ -431,141 +419,106 @@
 
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
 	<target name="ProcessTestCasesResults">
-		<trycatch property="errormessage">
-			<try>		
-				<path id="TestComplete.RawLogInXml.Folder"> 
-					<fileset dir="${AutomationVM.Project.dir}/RawResultsInXml" includes="**/Log/**/{*}"/> 
-				</path> 
+		<trycatch property="Msg.ProdessTestResult">
+			<try>
+				<!-- Copy the raw automation logs to a folder under job workspace. -->
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
+				<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
+					<fileset dir="${Automation.Project.dir}">
+						<include name="**/Log/**/{*}"/>
+					</fileset>
+				</copy>
 
-				<path id="TestComplete.ConvertedLogInHtml.Folder"> 
-					<fileset dir="${AutomationVM.Project.dir}/Log" includes="**/*"/> 
-				</path> 
+				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
+				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\html"/>
+				<copy todir="${Automation.TestResults.dir}/html">
+					<fileset dir="${Automation.ConvertedLog.dir}"/>
+				</copy>
 
-				<property name="TestComplete.RawResultsInXml"  refid="TestComplete.RawLogInXml.Folder"/> 
-				<property name="TestComplete.ConvertedResultsInHtml"  refid="TestComplete.ConvertedLogInHtml.Folder"/> 	
+				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
+				<if>
+					<equals arg1="${Product.TIC}" arg2="true"/>
+					<then>
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+						<copy todir="${Automation.TestResults.dir}/Support_Bundle">
+							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
+						</copy>
+					</then>
+				</if>   
 			</try>
 			<catch>
-				<echo message="${errormessage}"/>
+				<echo message="${Msg.ProdessTestResult}"/>
+			</catch>
+			<finally>
+				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
+					<arg value="${Automation.TestResults.dir}"/>
+				</exec>
+			</finally>
+		</trycatch>
+	</target>
+
+	<!--Remove C:\Automation from test VM-->
+	<target name="DeleteAutomationFilesOnVM" if="domain.prod">
+		<trycatch property="Msg.DeleteAutomationFiles">
+			<try>
+				<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
+				<delete includeEmptyDirs="true">
+					<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
+				</delete>
+			</try>
+			<catch>
+				<echo message="${Msg.DeleteAutomationFiles}"/>
 			</catch>
 		</trycatch>
-		<!--     
-		<echo message="TestComplete RawResultsInXml:${TestComplete.RawResultsInXml}"/>	     
-		<echo message="TestComplete ConvertedResultsInHtml:${TestComplete.ConvertedResultsInHtml}"/>
-		-->	     
-		<condition property="TestComplete.Results.existed" else="false">
-			<and>
-				<not><equals arg1="" arg2="${TestComplete.RawResultsInXml}"/></not>
-				<not><equals arg1="" arg2="${TestComplete.ConvertedResultsInHtml}"/></not> 
-			</and>
-		</condition> 
-		<echo message="TestComplete finished running. Results is generated:${TestComplete.Results.existed}"/>
+	</target>
+
+	<target name="PowerOffVM" if="domain.prod">
 		<if>
-			<equals arg1="${TestComplete.Results.existed}" arg2="true"/>
+			<!--Not for smoke test which is running on slave VM-->
+			<not>
+				<equals arg1="${Test.Type}" arg2="smoke"/>
+			</not>
 			<then>
-				<trycatch property="errormessage">
-					<try>
-						<!-- Copy the raw TC logs to jenkins test results folder:${Automation.TestResults.dir} -->
-						<echo message="Copy TC raw log from ${AutomationVM.Project.dir} to ${Automation.TestResults.dir}"/>
-						<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
-							<fileset dir="${AutomationVM.Project.dir}">
-								<include name="**/Log/**/{*}"/>
-							</fileset>
-						</copy>
-
-						<!-- Copy the TestComplete converted log for jenkins html publisher folder. -->
-						<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
-						<echo message="Copy converted html log from ${AutomationVM.HtmlLog.dir} to ${Automation.TestResults.dir}\html"/>
-						<mkdir dir="${Automation.TestResults.dir}/html"/>
-						<copy todir="${Automation.TestResults.dir}/html">
-							<fileset dir="${AutomationVM.HtmlLog.dir}"/>
-						</copy>
-
-						<!-- Copy support bundle only for SoO. -->	
+				<if>
+					<!--Usually will power off VM by default unless job says NO-->
+					<not>
+						<equals arg1="${PowerOffVM}" arg2="false"/>
+					</not>
+					<then>
+						<!-- check whether need shut down second VM for upgrade remote test -->
 						<if>
-							<equals arg1="${Product.SoO}" arg2="true"/>
+							<isset property="SecondVM"/>
 							<then>
-								<echo message="Copying support bundle from ${AutomationVM.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
-								<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
-								<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-									<fileset dir="${AutomationVM.Project.dir}/RawResultsInXml/Support"/>
-								</copy>
+								<echo message="Shut down Second VM:${SecondVM}"/>
+								<antcall target="PowerOffAllAutomationVMOnEsx">
+									<param name="FirstVM" value="${SecondVM}"/>
+								</antcall>
 							</then>
 						</if>
-						<if>
-							<equals arg1="${Product.TIC}" arg2="true"/>
-							<then>
-								<echo message="Copying support bundle from ${AutomationVM.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
-								<mkdir dir="${Automation.TestResults.dir}/Support_Bundle"/>
-								<copy todir="${Automation.TestResults.dir}/Support_Bundle">
-									<fileset dir="${AutomationVM.Project.dir}/RawResultsInXml/Support"/>
-								</copy>
-							</then>
-						</if>   
-					</try>
-					<catch>
-						<echo message="${errormessage}"/>
-					</catch>
-					<finally>
-						<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkind to determine the job status. -->
-						<exec executable="${JenkinsServer.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-							<arg value="${Automation.TestResults.dir}"/>
-						</exec>
-					</finally>
-				</trycatch>  
-			</then>
-		</if> 
-	</target>
+						<echo message="Shut down the Automation VM:${FirstVM}"/>
 
-	<!--Remove c:\Automation from test VM-->
-	<target name="DeleteAutomationFilesOnVM">
-		<condition property="AutomationFiles.property.exists" else="false">
-			<and>
-				<available file="${AutomationVM.Automation.dir}" type="dir"/>
-			</and>
-		</condition>
-
-		<if>
-			<equals arg1="${AutomationFiles.property.exists}" arg2="true"/>
-			<then>
-				<echo message="${AutomationVM.Automation.dir} exist!"/>
-				<delete includeEmptyDirs="true">
-					<fileset dir="${AutomationVM.Automation.dir}" excludes="NightlyBuild/"/>
-				</delete>
-				<echo message="Delete automation files ${AutomationVM.Automation.dir} on VM"/>
+						<antcall target="PowerOffAllAutomationVMOnEsx"/>
+					</then>
+					<!--If not power off VM, then need to clean up automation work directory for next job-->
+					<else>
+						<antcall target="DeleteAutomationFilesOnVM"/>
+					</else>
+				</if>
 			</then>
 		</if>
 	</target>
 
-	<target name="PowerOffVM">
-		<!-- set condition for checking properties whether set on jenkins configuration -->
-		<condition property="SecondVM.property.exists" else="false">
-			<isset property="SecondVM"/>
-		</condition>
-
-		<!-- check whether need shut down second VM for upgrade remote test -->
-		<if>
-			<equals arg1="${SecondVM.property.exists}" arg2="true"/>
-			<then>
-				<echo message="Shut down Second VM:${SecondVM}"/>
-				<antcall target="PowerOffAllAutomationVMOnEsx">
-					<param name="FirstVM" value="${SecondVM}"/>
-				</antcall>
-			</then>
-		</if>
-		<echo message="Shut down the Automation VM:${FirstVM}"/>
-
-		<antcall target="PowerOffAllAutomationVMOnEsx"/>	 
-	</target>
-
-	<target name="TakeFailedSnapshotOnVM">
+	<target name="TakeFailedSnapshotOnVM" if="domain.prod">
 		<echo message="Calling ExecuteEsxCommand."/>
 		<antcall target="ExecuteEsxCommand">
 			<param name="argCommand" value="snapshotfailure"/>
-			<param name="AutomationExecuteVM" value="${AutomationVM}"/>
+			<param name="AutomationExecuteVM" value="${FirstVM}"/>
 		</antcall>
 	</target>
 
-	<target name="ExecuteEsxCommand">
+	<target name="ExecuteEsxCommand" if="domain.prod">
 		<echo message="================================================"/>
 		<echo message="argCommand    ${argCommand}" />
 		<echo message="AutomationVM  ${AutomationExecuteVM}"/>
@@ -573,7 +526,7 @@
 		<echo message="ESX_USERNAME  ${ESX_USERNAME}"/>
 		<echo message="ESX_PASSWORD  ${ESX_PASSWORD}"/>	
 		<echo message="================================================"/>
-		<exec dir="${JenkinsServer.AntScripts.dir}" executable="powershell" failonerror="false" errorproperty="ErrorMessage" resultproperty="PowerShellErrorCode">
+		<exec dir="${Automation.AntScripts.dir}" executable="powershell" failonerror="false" errorproperty="ErrorMessage" resultproperty="PowerShellErrorCode">
 			<arg value="-File"/>
 			<arg value="ESXUtilities.ps1"/>
 			<arg value="${argCommand}"/>
@@ -587,14 +540,7 @@
 		<property name="EsxCommandReturnCode" value="${PowerShellErrorCode}"/>
 	</target>
 
-	<target name="CleanProductInstaller">
-		<echo message="Cleaning old product version:${JenkinsServer.ProductInstaller.dir}."/>
-		<delete includeemptydirs="true">
-			<fileset dir="${JenkinsServer.ProductInstaller.dir}" includes="**/*"/>
-		</delete>
-	</target>
-
-	<target name="PowerOffAllAutomationVMOnEsx">
+	<target name="PowerOffAllAutomationVMOnEsx" if="domain.prod">
 		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
 			<param name="argCommand" value="shutdown"/>
 			<param name="AutomationExecuteVM" value="${FirstVM}"/>
@@ -610,29 +556,17 @@
 		</if>
 	</target>
 
-	<target name="DeletePrebuild">
+	<target name="DeletePrebuild" if="domain.prod">
 		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
 			<param name="argCommand" value="deleteprebuild"/>
 			<param name="AutomationExecuteVM" value="${FirstVM}"/>
 		</antcallback>
 	</target>
 
-	<target name="CreatePrebuild">
+	<target name="CreatePrebuild" if="domain.prod">
 		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
 			<param name="argCommand" value="createprebuild"/>
 			<param name="AutomationExecuteVM" value="${FirstVM}"/>
 		</antcallback>
-	</target>
-
-	<target name="ExecuteWindowsUpdate">
-		<antcall target="StartVMToPrebuild"/>
-		<echo message="wait 8 hours for windows updating......."/>
-		<sleep seconds="28800"/>
-		<echo message="Windows Updates finished,need power off to create new snapshot"/>
-		<antcall target="PowerOffAllAutomationVMOnEsx"/>
-		<echo message="Deleting older prebuild snapshot..."/>
-		<antcall target="DeletePrebuild"/>
-		<echo message="Creating new prebuild snapshot...."/>
-		<antcall target="CreatePrebuild"/>
 	</target>
 </project>
