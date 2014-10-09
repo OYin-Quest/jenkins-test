@@ -11,7 +11,7 @@
 
 	<condition property="Product.TDECP" else="false">
 		<contains string="${ProductName}" substring="TDECP"/>
-		<contains string="${ProductName}" substring="TDPV"
+		<contains string="${ProductName}" substring="TDPV"/>
 	</condition>
 	
 	<condition property="Product.DataPoint" else="false">
