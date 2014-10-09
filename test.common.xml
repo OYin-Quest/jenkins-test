@@ -10,8 +10,10 @@
 	</condition>
 
 	<condition property="Product.TDECP" else="false">
-		<contains string="${ProductName}" substring="TDECP"/>
-		<contains string="${ProductName}" substring="TDPV"/>
+		<or>
+			<contains string="${ProductName}" substring="TDECP"/>
+			<contains string="${ProductName}" substring="TDPV"/>
+		</or>
 	</condition>
 	
 	<condition property="Product.DataPoint" else="false">
