@@ -10,7 +10,10 @@
 	</condition>
 
 	<condition property="Product.TDECP" else="false">
-		<contains string="${ProductName}" substring="TDECP"/>
+		<or>
+			<contains string="${ProductName}" substring="TDECP"/>
+			<contains string="${ProductName}" substring="TDPV"/>
+		</or>
 	</condition>
 	
 	<condition property="Product.DataPoint" else="false">
@@ -92,9 +95,10 @@
 		<echo message="Automation.TCScripts.dir=${Automation.TCScripts.dir}"/>
 		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
 		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
-		<echo message="Test.Domain=${Test.Domain}"/>
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
+		<echo message="SiteCode=${SiteCode}"/>
+		<echo message="Test.Domain=${Test.Domain}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
