@@ -95,9 +95,10 @@
 		<echo message="Automation.TCScripts.dir=${Automation.TCScripts.dir}"/>
 		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
 		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
-		<echo message="Test.Domain=${Test.Domain}"/>
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
+		<echo message="SiteCode=${SiteCode}"/>
+		<echo message="Test.Domain=${Test.Domain}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
