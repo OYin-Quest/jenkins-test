@@ -187,6 +187,11 @@
 		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
 		<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
+		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+		<var name="InstallerFileNameWithSuffix" unset="true"/>
 
 		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
 		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
@@ -383,14 +388,14 @@
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
 		<echo>AutomationVM:                           ${FirstVM}</echo>
-		<echo>Automation.Project.dir :                ${Automation.Project.dir}</echo>
+		<echo>Automation.Local.dir :                  ${Automation.Local.dir}</echo>
 		<echo>Automation TestUser:                    ${Automation.TestUser}</echo>
 		<echo>Automation TestPassword:                ${Automation.TestPassword}</echo>
 		<echo>Automation TestExecutable:              ${Automation.TestExecutable}</echo>
 		<echo>Automation ProjectSuit:                 ${Automation.pjs}</echo>
 		<echo>Automation TestParameters:              ${TestParameterSet}</echo>
 		<echo message="------------------------------------------------------------------"/>
-		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		<echo message="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute psexec to run automation tests..."/>
 		<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
 			<env key="test.oyin" path="${JenkinsEnv.TestVMLoginAccount}" />
@@ -399,7 +404,7 @@
 			<arg value="60"/>
 			<arg line="-u ${Automation.TestUser} -p ${Automation.TestPassword}"/> 
 			<arg line="-i -h wscript"/>
-			<arg line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
+			<arg line="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
 		</exec>
 		<echo message="===================PsexecOutput=========================="/>
 		<echo message="${PsexecOutput}"/>
