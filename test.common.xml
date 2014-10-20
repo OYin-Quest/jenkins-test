@@ -443,7 +443,10 @@
 
 				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
 				<if>
-					<equals arg1="${Product.TIC}" arg2="true"/>
+					<or>
+						<equals arg1="${Product.TIC}" arg2="true"/>
+						<equals arg1="${Product.TDECP}" arg2="true"/>
+					</or>
 					<then>
 						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
 						<copy todir="${Automation.TestResults.dir}/Support_Bundle">
