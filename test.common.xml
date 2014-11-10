@@ -254,6 +254,7 @@
 						</classpath>
 					</java>
 				</else>
+		</if>
 		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
 	</target>
 
