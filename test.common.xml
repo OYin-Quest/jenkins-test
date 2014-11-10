@@ -168,7 +168,7 @@
 		<echo message="The Installer file name is : ${InstallerFileName}"/>
 	</target>
 
-	<target name="SetBuildDisplayName" if="domain.prod">
+	<target name="SetBuildDisplayName">
 		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 		<if>
 			<or>
@@ -180,7 +180,7 @@
 				<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 			</then>
 		</if>
-
+		
 		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 		<var name="BuildDisplayName" value="${InstallerFileName}"/>
 		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
@@ -220,94 +220,43 @@
 		<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
 		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
 
-		<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
-			<arg value="-s"/> 
-			<arg line="${JenkinsEnv.JENKINS_URL}"/>
-			<arg value="set-build-display-name"/>
-			<arg value="${JenkinsEnv.JOB_NAME}"/>
-			<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-			<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-			<!--arg line="username"/>
-			<arg line="${JenkinsServer.Username}"/>
-			<arg line="password"/>
-			<arg line="${JenkinsServer.Password}"/-->
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
-	</target>
-	<target name="SetBuildDisplayName" unless="domain.prod">
-		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 		<if>
-			<or>
-				<equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
-				<equals arg1="InstallerFileName" arg2=""/>
-			</or>
-			<then>
-				<echo message="Call target GetInstallerFileName to get Installer name"/>
-				<antcallback target="GetInstallerFileName" return="InstallerFileName" />
-			</then>
-		</if>
-
-		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-		<var name="BuildDisplayName" value="${InstallerFileName}"/>
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
-		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
-		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDataPointViewer" replace="TDPV" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-		<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
-		<var name="DisplayInstallerFileName" unset="true"/>
-
-		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-
-		<echo message="Display Build version : ${DisplayInstallerFileName}"/>
-		<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
-		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
-
-		<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
-			<arg value="-s"/> 
-			<arg line="${JenkinsEnv.JENKINS_URL}"/>
-			<arg value="set-build-display-name"/>
-			<arg value="${JenkinsEnv.JOB_NAME}"/>
-			<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-			<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-			<arg line="username"/>
-			<arg line="${JenkinsServer.Username}"/>
-			<arg line="password"/>
-			<arg line="${JenkinsServer.Password}"/>
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
+			<equals arg1="${Test.Domain}" arg2="skytap"/>
+				<then>
+					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<arg value="-s"/> 
+						<arg line="${JenkinsEnv.JENKINS_URL}"/>
+						<arg value="set-build-display-name"/>
+						<arg value="${JenkinsEnv.JOB_NAME}"/>
+						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						<arg line="username"/>
+						<arg line="${JenkinsServer.Username}"/>
+						<arg line="password"/>
+						<arg line="${JenkinsServer.Password}"/>
+						<classpath>
+							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+							<pathelement path="${java.class.path}"/>
+						</classpath>
+					</java>
+				</then>
+				<else>
+					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<arg value="-s"/> 
+						<arg line="${JenkinsEnv.JENKINS_URL}"/>
+						<arg value="set-build-display-name"/>
+						<arg value="${JenkinsEnv.JOB_NAME}"/>
+						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						<classpath>
+							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+							<pathelement path="${java.class.path}"/>
+						</classpath>
+					</java>
+				</else>
 		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
 	</target>
+
 	<!--This target for automation which is running in ESX VM, and not for smoke test which is running on slave-->
 	<target name="StartVMToPrebuild" if="domain.prod">
 		<if>
