@@ -11,6 +11,22 @@
 		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+		<target name="test1"> 
+		<antcall target="EchoAntProperty"/>
+		<antcall target="InitJenkinsServerJobWorkSpace"/>
+		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
+		<antcall target="RunTestCasesOnVM"/>
+		<antcall target="ProcessTestCasesResults"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+		<target name="test2"> 
+		<antcall target="EchoAntProperty"/>
+		<antcall target="InitJenkinsServerJobWorkSpace"/>
+		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
+		<antcall target="RunTestCasesOnVM"/>
+		<antcall target="ProcessTestCasesResults"/>
 		<antcall target="PowerOffVM"/>
 	</target>
 </project>

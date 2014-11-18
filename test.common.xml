@@ -487,7 +487,7 @@
 	</target>
 
 	<!--Remove C:\Automation from test VM-->
-	<target name="DeleteAutomationFilesOnVM" if="domain.prod">
+	<target name="DeleteAutomationFilesOnVM">
 		<trycatch property="Msg.DeleteAutomationFiles">
 			<try>
 				<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
