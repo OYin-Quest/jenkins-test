@@ -16,6 +16,7 @@
 		<target name="test1"> 
 		<antcall target="EchoAntProperty"/>
 		<antcall target="InitJenkinsServerJobWorkSpace"/>
+		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
 		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults2"/>
@@ -24,6 +25,7 @@
 		<target name="test2"> 
 		<antcall target="EchoAntProperty"/>
 		<antcall target="InitJenkinsServerJobWorkSpace"/>
+		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
 		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults3"/>
