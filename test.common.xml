@@ -170,6 +170,20 @@
 	<target name="SetBuildDisplayName">
 		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 		<if>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
+			<then>
+				<if>
+					<not>
+					<equals arg1="${Test.Type}" arg2="E2E1"/>
+					</not>
+					<then>
+						<echo message="The build display name is already set"/>
+					</then>
+				</if>
+			</then>
+			
+		</if>
+		<if>
 			<or>
 				<equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
 				<equals arg1="InstallerFileName" arg2=""/>
@@ -441,12 +455,58 @@
 	</target>
 
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
-	<target name="ProcessTestCasesResults1">
-	
+	<target name="ProcessTestCasesResults">
+	<if>
+		<!--For E2E test running in Skytap.-->
+		<contains string="${Test.Type}" substring="E2E"/>
+		<then>
+			<trycatch property="Msg.ProdessTestResult">
+			<try>
+				<!-- Copy the raw automation logs to a folder under job workspace. -->
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}\${Test.Type}"/>
+				<copy todir="${Automation.TestResults1.dir}\${Test.Type}" flatten="true" overwrite="true">
+					<fileset dir="${Automation.Project.dir}">
+						<include name="**/Log/**/{*}"/>
+					</fileset>
+				</copy>
+
+				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
+				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\${Test.Type}\html"/>
+				<copy todir="${Automation.TestResults.dir}\${Test.Type}/html">
+					<fileset dir="${Automation.ConvertedLog.dir}"/>
+				</copy>
+
+				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
+				<if>
+					<or>
+						<equals arg1="${Product.TIC}" arg2="true"/>
+						<equals arg1="${Product.TDECP}" arg2="true"/>
+					</or>
+					<then>
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\${Test.Type}\Support_Bundle" />
+						<copy todir="${Automation.TestResults.dir}\${Test.Type}/Support_Bundle">
+							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
+						</copy>
+					</then>
+				</if>   
+			</try>
+			<catch>
+				<echo message="${Msg.ProdessTestResult}"/>
+			</catch>
+			<finally>
+				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
+					<arg value="${Automation.TestResults.dir}\${Test.Type}"/>
+				</exec>
+			</finally>
+		    </trycatch>
+		</then>
+	</if> 
 		<trycatch property="Msg.ProdessTestResult">
 			<try>
 				<!-- Copy the raw automation logs to a folder under job workspace. -->
-				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults1.dir}"/>
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
 				<copy todir="${Automation.TestResults1.dir}" flatten="true" overwrite="true">
 					<fileset dir="${Automation.Project.dir}">
 						<include name="**/Log/**/{*}"/>
@@ -456,7 +516,7 @@
 				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
 				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
 				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\html"/>
-				<copy todir="${Automation.TestResults1.dir}/html">
+				<copy todir="${Automation.TestResults.dir}/html">
 					<fileset dir="${Automation.ConvertedLog.dir}"/>
 				</copy>
 
@@ -467,8 +527,8 @@
 						<equals arg1="${Product.TDECP}" arg2="true"/>
 					</or>
 					<then>
-						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults1.dir}\Support_Bundle" />
-						<copy todir="${Automation.TestResults1.dir}/Support_Bundle">
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+						<copy todir="${Automation.TestResults.dir}/Support_Bundle">
 							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
@@ -480,99 +540,12 @@
 			<finally>
 				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
 				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-					<arg value="${Automation.TestResults1.dir}"/>
+					<arg value="${Automation.TestResults.dir}"/>
 				</exec>
 			</finally>
 		</trycatch>
 	</target>
-	<target name="ProcessTestCasesResults2">
-	
-		<trycatch property="Msg.ProdessTestResult">
-			<try>
-				<!-- Copy the raw automation logs to a folder under job workspace. -->
-				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults2.dir}"/>
-				<copy todir="${Automation.TestResults2.dir}" flatten="true" overwrite="true">
-					<fileset dir="${Automation.Project.dir}">
-						<include name="**/Log/**/{*}"/>
-					</fileset>
-				</copy>
 
-				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
-				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
-				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults2.dir}\html"/>
-				<copy todir="${Automation.TestResults2.dir}/html">
-					<fileset dir="${Automation.ConvertedLog.dir}"/>
-				</copy>
-
-				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
-				<if>
-					<or>
-						<equals arg1="${Product.TIC}" arg2="true"/>
-						<equals arg1="${Product.TDECP}" arg2="true"/>
-					</or>
-					<then>
-						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults2.dir}\Support_Bundle" />
-						<copy todir="${Automation.TestResults2.dir}/Support_Bundle">
-							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
-						</copy>
-					</then>
-				</if>   
-			</try>
-			<catch>
-				<echo message="${Msg.ProdessTestResult}"/>
-			</catch>
-			<finally>
-				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-					<arg value="${Automation.TestResults2.dir}"/>
-				</exec>
-			</finally>
-		</trycatch>
-	</target>
-	<target name="ProcessTestCasesResults3">
-	
-		<trycatch property="Msg.ProdessTestResult">
-			<try>
-				<!-- Copy the raw automation logs to a folder under job workspace. -->
-				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults3.dir}"/>
-				<copy todir="${Automation.TestResults3.dir}" flatten="true" overwrite="true">
-					<fileset dir="${Automation.Project.dir}">
-						<include name="**/Log/**/{*}"/>
-					</fileset>
-				</copy>
-
-				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
-				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
-				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults3.dir}\html"/>
-				<copy todir="${Automation.TestResults3.dir}/html">
-					<fileset dir="${Automation.ConvertedLog.dir}"/>
-				</copy>
-
-				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
-				<if>
-					<or>
-						<equals arg1="${Product.TIC}" arg2="true"/>
-						<equals arg1="${Product.TDECP}" arg2="true"/>
-					</or>
-					<then>
-						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults3.dir}\Support_Bundle" />
-						<copy todir="${Automation.TestResults3.dir}/Support_Bundle">
-							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
-						</copy>
-					</then>
-				</if>   
-			</try>
-			<catch>
-				<echo message="${Msg.ProdessTestResult}"/>
-			</catch>
-			<finally>
-				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-					<arg value="${Automation.TestResults3.dir}"/>
-				</exec>
-			</finally>
-		</trycatch>
-	</target>
 	<!--Remove C:\Automation from test VM-->
 	<target name="DeleteAutomationFilesOnVM">
 		<trycatch property="Msg.DeleteAutomationFiles">
