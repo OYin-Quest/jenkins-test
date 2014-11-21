@@ -73,10 +73,10 @@
 		</else>
 	</if>
 	
-	<!--Test.Domain is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
+	<!--SiteCode is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
 	<condition property="domain.prod">
 		<not>
-			<equals arg1="${Test.Domain}" arg2="skytap"/>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
 		</not>
 	</condition>
 	
@@ -98,7 +98,6 @@
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
-		<echo message="Test.Domain=${Test.Domain}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
@@ -221,7 +220,7 @@
 		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
 
 		<if>
-			<equals arg1="${Test.Domain}" arg2="skytap"/>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
 				<then>
 					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
 						<arg value="-s"/> 
@@ -368,6 +367,7 @@
 			<arg value="automationDir=${Automation.Work.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
 			<arg value="testBranch=${TEST_BRANCH}"/>
+			<arg value="siteCode=${SiteCode}"/>
 			<classpath>
 				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -417,7 +417,6 @@
 		<echo message="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute psexec to run automation tests..."/>
 		<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
-			<env key="test.oyin" path="${JenkinsEnv.TestVMLoginAccount}" />
 			<arg value="\\${FirstVM}"/>
 			<arg value="-n"/>
 			<arg value="60"/>
