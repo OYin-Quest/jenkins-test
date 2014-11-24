@@ -101,17 +101,28 @@
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
-		<trycatch property="Msg.DeleteTestResult">
-			<try>
-				<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
-				<delete includeemptydirs="true">
-					<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
-				</delete>
-			</try>
-			<catch>
-				<echo message="${Msg.DeleteTestResult}" />
-			</catch>
-		</trycatch>
+	 <if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			<echo message="This is the E2E job, do not need to clean up previous test results"/>
+		</then>
+		<else>
+			<trycatch property="Msg.DeleteTestResult">
+				<try>
+					<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
+					<delete includeemptydirs="true">
+						<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteTestResult}" />
+				</catch>
+			</trycatch>
+		</else>
+	</if>
 	</target>
 
 	<target name="GetLatestBuild">
