@@ -170,28 +170,24 @@
 	<target name="SetBuildDisplayName">
 		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 	 <if>
-		<equals arg1="${SiteCode}" arg2="skytap"/>
-		<then>
-		    <if>
-		        <not>
-		          <equals arg1="${Test.Type}" arg2="E2E1"/>
-		        </not>
-	            <then>
-				  <echo message="The build display name is already set"/>
-		        </then>
-		    </if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			 <echo message="The build display name is already set"/>
 		</then>
-		<else>
-			<if>
-				<or>
-					<equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
-					<equals arg1="InstallerFileName" arg2=""/>
-				</or>
-				<then>
+	    <else>
+			 <if>
+				 <or>
+					 <equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
+					 <equals arg1="InstallerFileName" arg2=""/>
+				 </or>
+				 <then>
 					<echo message="Call target GetInstallerFileName to get Installer name"/>
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
-			</if>
+			 </if>
 		
 			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 			<var name="BuildDisplayName" value="${InstallerFileName}"/>
@@ -268,71 +264,71 @@
 				</else>
 			</if>
 			<echo message="Set build display name : ${DisplayInstallerFileName}"/>
-		</else>
-	</if>
+	    </else>
+	 </if>
 	</target>
 
 	<!--This target for automation which is running in ESX VM, and not for smoke test which is running on slave-->
 	<target name="StartVMToPrebuild" if="domain.prod">
 		<if>
 			<!--For smoke test running on slave VM. The VM keeps on-line all the time, no need to start, just delete snapshot for it.-->
-			<equals arg1="${Test.Type}" arg2="smoke"/>
-			<then>
-				<antcall target="DeleteFailedSnapshots"/>
-			</then>
-			<else>
-				<if>
+			 <equals arg1="${Test.Type}" arg2="smoke"/>
+			 <then>
+				 <antcall target="DeleteFailedSnapshots"/>
+			 </then>
+			 <else>
+				 <if>
 					<!--Don't start VM to prebuild if job says NO-->
-					<not>
-						<equals arg1="${StartVMToPrebuild}" arg2="false"/>
-					</not>
-					<then>
-						<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-						<!-- check whether need start second VM for upgrade remote test -->
-						<if>
-							<isset property="SecondVM"/>
-							<then>
-								<echo message="Start Second VM for upgrade remote tests."/>
-								<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-									<param name="argCommand" value="start"/>
-									<param name="AutomationExecuteVM" value="${SecondVM}"/>
-								</antcallback>
-								<if>
-									<not>
-										<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-									</not>
-									<then>
-										<fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
-									</then>
-								</if>
-							</then>
-						</if>
-						<!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
-						<echo message="Start Automation VM."/>
-						<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-							<param name="argCommand" value="start"/>
-							<param name="AutomationExecuteVM" value="${FirstVM}"/>
-						</antcallback>
+					 <not>
+						 <equals arg1="${StartVMToPrebuild}" arg2="false"/>
+					 </not>
+					 <then>
+						 <echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
+						 <!-- check whether need start second VM for upgrade remote test -->
+						 <if>
+							 <isset property="SecondVM"/>
+							 <then>
+								 <echo message="Start Second VM for upgrade remote tests."/>
+								 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+									 <param name="argCommand" value="start"/>
+									 <param name="AutomationExecuteVM" value="${SecondVM}"/>
+								 </antcallback>
+								 <if>
+									 <not>
+										 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+									 </not>
+									 <then>
+										 <fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
+									 </then>
+								 </if>
+							 </then>
+						 </if>
+						 <!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
+						 <echo message="Start Automation VM."/>
+						 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+							 <param name="argCommand" value="start"/>
+							 <param name="AutomationExecuteVM" value="${FirstVM}"/>
+						 </antcallback>
 
-						<if>
-							<not>
-								<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-							</not>
-							<then>
-								<fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
-							</then>
-						</if>
-						<!--Why need this ipconfig & flushdns?-->
-						<echo message="execute ipconfig /flushdns on jenkins server."/>
-						<exec executable="cmd">
-							<arg value="/c" />
-							<arg value="ipconfig" />
-							<arg value="/flushdns" />
-						</exec>
-					</then>
-				</if>
-			</else>
-		</if>
+						 <if>
+							 <not>
+								 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+							 </not>
+							 <then>
+								 <fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
+							 </then>
+						 </if>
+						 <!--Why need this ipconfig & flushdns?-->
+						 <echo message="execute ipconfig /flushdns on jenkins server."/>
+						 <exec executable="cmd">
+							 <arg value="/c" />
+							 <arg value="ipconfig" />
+							 <arg value="/flushdns" />
+						 </exec>
+					 </then>
+				 </if>
+			 </else>
+		 </if>
 	</target>
 
 	<target name="DeleteFailedSnapshots" if="domain.prod">
