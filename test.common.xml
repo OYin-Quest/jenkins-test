@@ -73,10 +73,10 @@
 		</else>
 	</if>
 	
-	<!--Test.Domain is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
+	<!--SiteCode is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
 	<condition property="domain.prod">
 		<not>
-			<equals arg1="${Test.Domain}" arg2="skytap"/>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
 		</not>
 	</condition>
 	
@@ -98,7 +98,6 @@
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
-		<echo message="Test.Domain=${Test.Domain}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
@@ -180,7 +179,7 @@
 				<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 			</then>
 		</if>
-
+		
 		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 		<var name="BuildDisplayName" value="${InstallerFileName}"/>
 		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
@@ -220,22 +219,41 @@
 		<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
 		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
 
-		<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
-			<arg value="-s"/> 
-			<arg line="${JenkinsEnv.JENKINS_URL}"/>
-			<arg value="set-build-display-name"/>
-			<arg value="${JenkinsEnv.JOB_NAME}"/>
-			<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-			<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-			<!--arg line="username"/>
-			<arg line="${JenkinsServer.Username}"/>
-			<arg line="password"/>
-			<arg line="${JenkinsServer.Password}"/-->
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
+		<if>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
+				<then>
+					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<arg value="-s"/> 
+						<arg line="${JenkinsEnv.JENKINS_URL}"/>
+						<arg value="set-build-display-name"/>
+						<arg value="${JenkinsEnv.JOB_NAME}"/>
+						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						<arg line="--username"/>
+						<arg line="${JenkinsServer.Username}"/>
+						<arg line="--password"/>
+						<arg line="${JenkinsServer.Password}"/>
+						<classpath>
+							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+							<pathelement path="${java.class.path}"/>
+						</classpath>
+					</java>
+				</then>
+			<else>
+					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<arg value="-s"/> 
+						<arg line="${JenkinsEnv.JENKINS_URL}"/>
+						<arg value="set-build-display-name"/>
+						<arg value="${JenkinsEnv.JOB_NAME}"/>
+						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						<classpath>
+							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+							<pathelement path="${java.class.path}"/>
+						</classpath>
+					</java>
+			</else>
+		</if>
 		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
 	</target>
 
@@ -349,6 +367,7 @@
 			<arg value="automationDir=${Automation.Work.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
 			<arg value="testBranch=${TEST_BRANCH}"/>
+			<arg value="siteCode=${SiteCode}"/>
 			<classpath>
 				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
