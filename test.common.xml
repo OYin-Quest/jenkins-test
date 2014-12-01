@@ -101,17 +101,28 @@
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
-		<trycatch property="Msg.DeleteTestResult">
-			<try>
-				<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
-				<delete includeemptydirs="true">
-					<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
-				</delete>
-			</try>
-			<catch>
-				<echo message="${Msg.DeleteTestResult}" />
-			</catch>
-		</trycatch>
+	 <if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			<echo message="This is the E2E job, do not need to clean up previous test results"/>
+		</then>
+		<else>
+			<trycatch property="Msg.DeleteTestResult">
+				<try>
+					<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
+					<delete includeemptydirs="true">
+						<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteTestResult}" />
+				</catch>
+			</trycatch>
+		</else>
+	</if>
 	</target>
 
 	<target name="GetLatestBuild">
@@ -169,155 +180,166 @@
 
 	<target name="SetBuildDisplayName">
 		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
-		<if>
-			<or>
-				<equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
-				<equals arg1="InstallerFileName" arg2=""/>
-			</or>
-			<then>
-				<echo message="Call target GetInstallerFileName to get Installer name"/>
-				<antcallback target="GetInstallerFileName" return="InstallerFileName" />
-			</then>
-		</if>
-		
-		<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-		<var name="BuildDisplayName" value="${InstallerFileName}"/>
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
-		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
-		<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDataPointViewer" replace="TDPV" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-		<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-		<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-		<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
-		<var name="DisplayInstallerFileName" unset="true"/>
-
-		<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-
-		<echo message="Display Build version : ${DisplayInstallerFileName}"/>
-		<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
-		<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
-
-		<if>
-			<equals arg1="${SiteCode}" arg2="skytap"/>
-				<then>
-					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
-						<arg value="-s"/> 
-						<arg line="${JenkinsEnv.JENKINS_URL}"/>
-						<arg value="set-build-display-name"/>
-						<arg value="${JenkinsEnv.JOB_NAME}"/>
-						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-						<arg line="--username"/>
-						<arg line="${JenkinsServer.Username}"/>
-						<arg line="--password"/>
-						<arg line="${JenkinsServer.Password}"/>
-						<classpath>
-							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-							<pathelement path="${java.class.path}"/>
-						</classpath>
-					</java>
+	 <if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			 <echo message="The build display name is already set"/>
+		</then>
+	    <else>
+			 <if>
+				 <or>
+					 <equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
+					 <equals arg1="InstallerFileName" arg2=""/>
+				 </or>
+				 <then>
+					<echo message="Call target GetInstallerFileName to get Installer name"/>
+					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
-			<else>
-					<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
-						<arg value="-s"/> 
-						<arg line="${JenkinsEnv.JENKINS_URL}"/>
-						<arg value="set-build-display-name"/>
-						<arg value="${JenkinsEnv.JOB_NAME}"/>
-						<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-						<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-						<classpath>
-							<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-							<pathelement path="${java.class.path}"/>
-						</classpath>
-					</java>
-			</else>
-		</if>
-		<echo message="Set build display name : ${DisplayInstallerFileName}"/>
+			 </if>
+		
+			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
+			<var name="BuildDisplayName" value="${InstallerFileName}"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDataPointViewer" replace="TDPV" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+		
+			<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
+			<var name="DisplayInstallerFileName" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+
+			<echo message="Display Build version : ${DisplayInstallerFileName}"/>
+			<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
+			<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
+
+			<if>
+				<equals arg1="${SiteCode}" arg2="skytap"/>
+					<then>
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+							<arg value="-s"/> 
+							<arg line="${JenkinsEnv.JENKINS_URL}"/>
+							<arg value="set-build-display-name"/>
+							<arg value="${JenkinsEnv.JOB_NAME}"/>
+							<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+							<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<arg line="--username"/>
+							<arg line="${JenkinsServer.Username}"/>
+							<arg line="--password"/>
+							<arg line="${JenkinsServer.Password}"/>
+							<classpath>
+								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+								<pathelement path="${java.class.path}"/>
+							</classpath>
+						</java>
+					</then>
+				<else>
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+							<arg value="-s"/> 
+							<arg line="${JenkinsEnv.JENKINS_URL}"/>
+							<arg value="set-build-display-name"/>
+							<arg value="${JenkinsEnv.JOB_NAME}"/>
+							<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
+							<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<classpath>
+								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+								<pathelement path="${java.class.path}"/>
+							</classpath>
+						</java>
+				</else>
+			</if>
+			<echo message="Set build display name : ${DisplayInstallerFileName}"/>
+	    </else>
+	 </if>
 	</target>
 
 	<!--This target for automation which is running in ESX VM, and not for smoke test which is running on slave-->
 	<target name="StartVMToPrebuild" if="domain.prod">
 		<if>
 			<!--For smoke test running on slave VM. The VM keeps on-line all the time, no need to start, just delete snapshot for it.-->
-			<equals arg1="${Test.Type}" arg2="smoke"/>
-			<then>
-				<antcall target="DeleteFailedSnapshots"/>
-			</then>
-			<else>
-				<if>
+			 <equals arg1="${Test.Type}" arg2="smoke"/>
+			 <then>
+				 <antcall target="DeleteFailedSnapshots"/>
+			 </then>
+			 <else>
+				 <if>
 					<!--Don't start VM to prebuild if job says NO-->
-					<not>
-						<equals arg1="${StartVMToPrebuild}" arg2="false"/>
-					</not>
-					<then>
-						<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-						<!-- check whether need start second VM for upgrade remote test -->
-						<if>
-							<isset property="SecondVM"/>
-							<then>
-								<echo message="Start Second VM for upgrade remote tests."/>
-								<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-									<param name="argCommand" value="start"/>
-									<param name="AutomationExecuteVM" value="${SecondVM}"/>
-								</antcallback>
-								<if>
-									<not>
-										<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-									</not>
-									<then>
-										<fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
-									</then>
-								</if>
-							</then>
-						</if>
-						<!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
-						<echo message="Start Automation VM."/>
-						<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-							<param name="argCommand" value="start"/>
-							<param name="AutomationExecuteVM" value="${FirstVM}"/>
-						</antcallback>
+					 <not>
+						 <equals arg1="${StartVMToPrebuild}" arg2="false"/>
+					 </not>
+					 <then>
+						 <echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
+						 <!-- check whether need start second VM for upgrade remote test -->
+						 <if>
+							 <isset property="SecondVM"/>
+							 <then>
+								 <echo message="Start Second VM for upgrade remote tests."/>
+								 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+									 <param name="argCommand" value="start"/>
+									 <param name="AutomationExecuteVM" value="${SecondVM}"/>
+								 </antcallback>
+								 <if>
+									 <not>
+										 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+									 </not>
+									 <then>
+										 <fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
+									 </then>
+								 </if>
+							 </then>
+						 </if>
+						 <!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
+						 <echo message="Start Automation VM."/>
+						 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
+							 <param name="argCommand" value="start"/>
+							 <param name="AutomationExecuteVM" value="${FirstVM}"/>
+						 </antcallback>
 
-						<if>
-							<not>
-								<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-							</not>
-							<then>
-								<fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
-							</then>
-						</if>
-						<!--Why need this ipconfig & flushdns?-->
-						<echo message="execute ipconfig /flushdns on jenkins server."/>
-						<exec executable="cmd">
-							<arg value="/c" />
-							<arg value="ipconfig" />
-							<arg value="/flushdns" />
-						</exec>
-					</then>
-				</if>
-			</else>
-		</if>
+						 <if>
+							 <not>
+								 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
+							 </not>
+							 <then>
+								 <fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
+							 </then>
+						 </if>
+						 <!--Why need this ipconfig & flushdns?-->
+						 <echo message="execute ipconfig /flushdns on jenkins server."/>
+						 <exec executable="cmd">
+							 <arg value="/c" />
+							 <arg value="ipconfig" />
+							 <arg value="/flushdns" />
+						 </exec>
+					 </then>
+				 </if>
+			 </else>
+		 </if>
 	</target>
 
 	<target name="DeleteFailedSnapshots" if="domain.prod">
@@ -442,11 +464,15 @@
 
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
 	<target name="ProcessTestCasesResults">
-		<trycatch property="Msg.ProdessTestResult">
+	<if>
+		<!--For E2E test running in Skytap.-->
+		<contains string="${Test.Type}" substring="E2E"/>
+		<then>
+			<trycatch property="Msg.ProdessTestResult">
 			<try>
 				<!-- Copy the raw automation logs to a folder under job workspace. -->
-				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
-				<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}\${Test.Type}"/>
+				<copy todir="${Automation.TestResults.dir}\${Test.Type}" flatten="true" overwrite="true">
 					<fileset dir="${Automation.Project.dir}">
 						<include name="**/Log/**/{*}"/>
 					</fileset>
@@ -454,8 +480,8 @@
 
 				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
 				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
-				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\html"/>
-				<copy todir="${Automation.TestResults.dir}/html">
+				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\${Test.Type}\html"/>
+				<copy todir="${Automation.TestResults.dir}\${Test.Type}/html">
 					<fileset dir="${Automation.ConvertedLog.dir}"/>
 				</copy>
 
@@ -466,8 +492,8 @@
 						<equals arg1="${Product.TDECP}" arg2="true"/>
 					</or>
 					<then>
-						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
-						<copy todir="${Automation.TestResults.dir}/Support_Bundle">
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\${Test.Type}\Support_Bundle" />
+						<copy todir="${Automation.TestResults.dir}\${Test.Type}/Support_Bundle">
 							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
@@ -479,25 +505,78 @@
 			<finally>
 				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
 				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-					<arg value="${Automation.TestResults.dir}"/>
+					<arg value="${Automation.TestResults.dir}\${Test.Type}"/>
 				</exec>
 			</finally>
-		</trycatch>
+		    </trycatch>
+		</then>
+		<else>
+			<trycatch property="Msg.ProdessTestResult">
+				<try>
+					<!-- Copy the raw automation logs to a folder under job workspace. -->
+					<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
+					<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
+						<fileset dir="${Automation.Project.dir}">
+							<include name="**/Log/**/{*}"/>
+						</fileset>
+					</copy>
+
+					<!-- Copy the TestComplete converted log to a folder under job workspace. -->
+					<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+					<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\html"/>
+					<copy todir="${Automation.TestResults.dir}/html">
+						<fileset dir="${Automation.ConvertedLog.dir}"/>
+					</copy>
+
+					<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
+					<if>
+						<or>
+							<equals arg1="${Product.TIC}" arg2="true"/>
+							<equals arg1="${Product.TDECP}" arg2="true"/>
+						</or>
+						<then>
+							<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
+								<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
+							</copy>
+						</then>
+					</if>   
+				</try>
+				<catch>
+					<echo message="${Msg.ProdessTestResult}"/>
+				</catch>
+				<finally>
+					<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
+						<arg value="${Automation.TestResults.dir}"/>
+					</exec>
+				</finally>
+			</trycatch>
+		 </else>
+	</if> 
 	</target>
 
 	<!--Remove C:\Automation from test VM-->
-	<target name="DeleteAutomationFilesOnVM" if="domain.prod">
-		<trycatch property="Msg.DeleteAutomationFiles">
-			<try>
-				<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
-				<delete includeEmptyDirs="true">
-					<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
-				</delete>
-			</try>
-			<catch>
-				<echo message="${Msg.DeleteAutomationFiles}"/>
-			</catch>
-		</trycatch>
+	<target name="DeleteAutomationFilesOnVM">
+	<if>
+		<or>
+			<equals arg1="${SiteCode}" arg2="zhuhai"/>
+			<contains string="${Test.Type}" substring="E2E"/>
+		</or>
+		<then>
+			<trycatch property="Msg.DeleteAutomationFiles">
+				<try>
+					<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
+					<delete includeEmptyDirs="true">
+						<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteAutomationFiles}"/>
+				</catch>
+			</trycatch>
+		</then>
+	</if>
 	</target>
 
 	<target name="PowerOffVM" if="domain.prod">
