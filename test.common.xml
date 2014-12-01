@@ -558,17 +558,25 @@
 
 	<!--Remove C:\Automation from test VM-->
 	<target name="DeleteAutomationFilesOnVM">
-		<trycatch property="Msg.DeleteAutomationFiles">
-			<try>
-				<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
-				<delete includeEmptyDirs="true">
-					<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
-				</delete>
-			</try>
-			<catch>
-				<echo message="${Msg.DeleteAutomationFiles}"/>
-			</catch>
-		</trycatch>
+	<if>
+		<or>
+			<equals arg1="${SiteCode}" arg2="zhuhai"/>
+			<contains string="${Test.Type}" substring="E2E"/>
+		</or>
+		<then>
+			<trycatch property="Msg.DeleteAutomationFiles">
+				<try>
+					<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
+					<delete includeEmptyDirs="true">
+						<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteAutomationFiles}"/>
+				</catch>
+			</trycatch>
+		</then>
+	</if>
 	</target>
 
 	<target name="PowerOffVM" if="domain.prod">
