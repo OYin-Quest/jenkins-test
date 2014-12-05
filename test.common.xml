@@ -443,7 +443,7 @@
 			<arg value="-n"/>
 			<arg value="60"/>
 			<arg line="-u ${Automation.TestUser} -p ${Automation.TestPassword}"/> 
-			<arg line="-i -h wscript"/>
+			<arg line="-i -h cscript"/>
 			<arg line="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}"/>
 		</exec>
 		<echo message="===================PsexecOutput=========================="/>
