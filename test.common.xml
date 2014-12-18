@@ -86,9 +86,11 @@
 	<target name="EchoAntProperty">
 		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
 		<echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
+		<echo message="Build URL: ${JenkinsEnv.BUILD_URL}"/>
 		<echo message="TestBranch=${TEST_BRANCH}"/>
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
 		<echo message="AutomationVM=${AutomationVM}"/>
+		<echo message="TestGroup=${RunGroupName}"/>
 		<echo message="TestTool=${Automation.TestExecutable}"/>
 		<echo message="Automation.AntUtilities.Dir=${Automation.AntUtilities.dir}"/>
 		<echo message="Automation.AntScripts.dir=${Automation.AntScripts.dir}"/>
@@ -504,9 +506,12 @@
 			</catch>
 			<finally>
 				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-					<arg value="${Automation.TestResults.dir}\${Test.Type}"/>
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000" outputproperty="ResultsTransformOutput">
+					<arg value='resultDir="${Automation.TestResults.dir}\${Test.Type}"'/>
+					<arg value='testedApp="${InstallerFileName}"'/>
+					<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
 				</exec>
+				<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
 			</finally>
 		    </trycatch>
 		</then>
@@ -547,9 +552,12 @@
 				</catch>
 				<finally>
 					<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000">
-						<arg value="${Automation.TestResults.dir}"/>
+					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="10800000" outputproperty="ResultsTransformOutput">
+						<arg value='resultDir="${Automation.TestResults.dir}"'/>
+						<arg value='testedApp="${InstallerFileName}"'/>
+						<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
 					</exec>
+					<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
 				</finally>
 			</trycatch>
 		 </else>
