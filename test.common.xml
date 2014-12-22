@@ -556,6 +556,7 @@
 						<arg value='resultDir="${Automation.TestResults.dir}"'/>
 						<arg value='testedApp="${InstallerFileName}"'/>
 						<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
+						<arg value="testBranch=${TEST_BRANCH}"/>
 					</exec>
 					<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
 				</finally>
