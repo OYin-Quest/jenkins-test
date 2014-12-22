@@ -499,7 +499,14 @@
 							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
-				</if>   
+				</if>  
+
+				<echo message="Copy dump file"/>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>				
 			</try>
 			<catch>
 				<echo message="${Msg.ProdessTestResult}"/>
@@ -510,6 +517,7 @@
 					<arg value='resultDir="${Automation.TestResults.dir}\${Test.Type}"'/>
 					<arg value='testedApp="${InstallerFileName}"'/>
 					<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
+					<arg value="testBranch=${TEST_BRANCH}"/>
 				</exec>
 				<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
 			</finally>
@@ -545,7 +553,14 @@
 								<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
-					</if>   
+					</if>  
+
+					<echo message="Copy dump file"/>
+					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
+						<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+							<include name="*.dmp"/>
+						</fileset>
+					</copy>
 				</try>
 				<catch>
 					<echo message="${Msg.ProdessTestResult}"/>
