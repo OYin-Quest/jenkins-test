@@ -12,5 +12,6 @@
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults"/>
 		<antcall target="PowerOffVM"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
 	</target>
 </project>
