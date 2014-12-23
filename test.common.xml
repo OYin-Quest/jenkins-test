@@ -513,7 +513,7 @@
 			</catch>
 			<finally>
 				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="900000" outputproperty="ResultsTransformOutput">
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
 					<arg value='resultDir=\"${Automation.TestResults.dir}\${Test.Type}\"'/>
 					<arg value='testedApp=\"${InstallerFileName}\"'/>
 					<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
@@ -567,7 +567,7 @@
 				</catch>
 				<finally>
 					<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
-					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="true" timeout="900000" outputproperty="ResultsTransformOutput">
+					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
 						<arg value='resultDir=\"${Automation.TestResults.dir}\"'/>
 						<arg value='testedApp=\"${InstallerFileName}\"'/>
 						<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
