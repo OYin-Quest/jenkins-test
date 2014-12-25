@@ -244,7 +244,7 @@
 			<if>
 				<equals arg1="${SiteCode}" arg2="skytap"/>
 					<then>
-						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
 							<arg value="-s"/> 
 							<arg line="${JenkinsEnv.JENKINS_URL}"/>
 							<arg value="set-build-display-name"/>
@@ -262,7 +262,7 @@
 						</java>
 					</then>
 				<else>
-						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="128m">
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
 							<arg value="-s"/> 
 							<arg line="${JenkinsEnv.JENKINS_URL}"/>
 							<arg value="set-build-display-name"/>
