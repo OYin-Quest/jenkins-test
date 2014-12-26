@@ -499,7 +499,14 @@
 							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
-				</if>   
+				</if>  
+
+				<echo message="Copy dump file"/>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>				
 			</try>
 			<catch>
 				<echo message="${Msg.ProdessTestResult}"/>
@@ -546,7 +553,14 @@
 								<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 							</copy>
 						</then>
-					</if>   
+					</if>  
+
+					<echo message="Copy dump file"/>
+					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
+						<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+							<include name="*.dmp"/>
+						</fileset>
+					</copy>
 				</try>
 				<catch>
 					<echo message="${Msg.ProdessTestResult}"/>
