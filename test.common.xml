@@ -441,6 +441,7 @@
 		<echo message="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute psexec to run automation tests..."/>
 		<exec executable="psexec" failonerror="false" timeout="18000000" outputproperty="PsexecOutput" errorproperty="PsexecErrorMsg" resultproperty="PsexecResultCode">
+			<env key="test.oyin" path="${JenkinsEnv.TestVMLoginAccount}" />
 			<arg value="\\${FirstVM}"/>
 			<arg value="-n"/>
 			<arg value="60"/>
