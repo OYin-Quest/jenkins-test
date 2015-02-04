@@ -1,12 +1,13 @@
 ﻿
 function GetDataFromXml()
 {
-  var t = XML.User.Document.documentElement;
+  var xmlDoc = Sys.OleObject("Msxml2.DOMDocument.6.0");
+  xmlDoc.load(Files.FileNameByName("DataPointArtifact_xml"));
   
   //ProcessNodeOne(t);
   
   //return;
-  var users = t.selectNodes("//user");
+  var users = xmlDoc.selectNodes("//DataPointArtifact[ID=1]");
   
   var results = new Array();
   
@@ -16,7 +17,7 @@ function GetDataFromXml()
   }
   
   
-  DumpObject(results, "User");
+  DumpObject(results, "artifact");
   //var obj = {};
   
   //var o = ProcessNode(users, obj);

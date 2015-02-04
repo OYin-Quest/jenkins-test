@@ -9,9 +9,15 @@
     <LastRun>Never.</LastRun>
     <NextRun>Never.</NextRun>
     <Status>N/A</Status>
+<<<<<<< HEAD
     <Schedule>No Scheduling.</Schedule>
     <Managers>Administrator</Managers>
     <Owner>Owner</Owner>
+=======
+    <Schedule>Schedule updated.</Schedule>
+    <Managers>Manager</Managers>
+    <Owner>Administrator</Owner>
+>>>>>>> master
     <LogCount>0</LogCount>
 	<Tags><![CDATA[<a>auto_script</a>, <a>not_run</a>]]></Tags>
 	<Visibility>"Visibility"</Visibility>
