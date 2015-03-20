@@ -392,21 +392,6 @@
 	</target>
 	
 	<target name="CopyAutomationFilesToVM">
-	<if>
-		<contains string="${InstallerFileNameUrl}" substring="http"/>
-		<then>
-			<echo message="InstallerFileNameUrl: ${InstallerFileNameUrl}"/>
-			<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
-			<arg value="-jar"/>
-			<arg value="DownloadInstallerFromJenkinsToVM"/> 
-			<arg value="url=${InstallerFileNameUrl}"/>
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-		</then>
-	</if>
 		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
 			<arg value="-jar"/>
 			<arg value="CopyAutomationFilesToVM"/> 
@@ -433,7 +418,23 @@
 				<antcall target="PowerOffVM"/>
 				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
 			</then>
-		</if> 
+		</if>
+		
+		<if>
+		<contains string="${InstallerFileNameUrl}" substring="http"/>
+		<then>
+			<echo message="InstallerFileNameUrl: ${InstallerFileNameUrl}"/>
+			<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
+			<arg value="-jar"/>
+			<arg value="DownloadInstallerFromJenkinsToVM"/> 
+			<arg value="url=${InstallerFileNameUrl}"/>
+			<classpath>
+				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
+				<pathelement path="${java.class.path}"/>
+			</classpath>
+		</java>
+		</then>
+	</if>
 	</target>
 
 	<target name="RunTestCasesOnVM">
