@@ -201,13 +201,32 @@
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
 			 </if>
-	    			<!-- Remove suffix if the InstallerFileName is installer url -->
+	    	<if>
+	    		<contains string="${InstallerFileName}" substring="http"/>
+	    		<echo message="Prepare installer name to set build display name"/>
+				<echo message="InstallerFileName is : ${InstallerFileName}"/>
+	    			<then>
+	    				<!-- Get First and Second VM when started two VMs-->
+	    				<script language="javascript"> <![CDATA[			  
+	    				var InstallerFileName = project.getProperty("InstallerFileName");				
+	    				var Installers = InstallerFileName.split(" & ");	
+	    				if(Installers.length>1){			 
+	    					project.setProperty("FirstInstaller",Installers[0]);				
+	    					project.setProperty("SecondInstaller",Installers[1]);	
+	    					project.setProperty("InstallerFileName",Installers[0] +" & " + SecondInstaller.substring(0,SecondInstaller.lastindexOf('\')) );
+	    				}else if(installers.length==1){
+	    					project.setProperty("InstallerFileName",Installers[0]);
+	    				}	
+	    				]]> </script>
+	    			</then>
+	    		</if>
+				<echo message="Prepare InstallerFileName is : ${InstallerFileName}"/>
+	    			<!-- Remove suffix if the InstallerFileName is installer url >
 	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
 	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
-	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<echo message="The original BuildDisplayName is: ${BuildDisplayName}"/>
-	    			<var name="InstallerFileNameWithSuffix" unset="true"/>	
+	    			<echo message="The original BuildDisplayName is: ${BuildDisplayName}"/>
+	    			<var name="InstallerFileNameWithSuffix" unset="true"/-->
 	    	
 	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
@@ -423,7 +442,7 @@
 		<if>
 		<contains string="${InstallerFileName}" substring="http"/>
 		<then>
-			<echo message="InstallerFileName: ${InstallerFileName}"/>
+			<echo message="Download Installer from URL: ${InstallerFileName}"/>
 			<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
 			<arg value="-jar"/>
 			<arg value="DownloadInstallerFromJenkinsToVM"/> 
