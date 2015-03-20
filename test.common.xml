@@ -208,13 +208,14 @@
 					<echo message="InstallerFileName is : ${InstallerFileName}"/>
 	    				<!-- Get First and Second VM when started two VMs-->
 	    				<script language="javascript"> <![CDATA[			  
-	    				var InstallerFileName = project.getProperty("InstallerFileName");				
+	    				var InstallerFileName = project.getProperty("InstallerFileName");	
+						var FileName = InstallerFileName.replace("\r\n", "");
 	    				var Installers = InstallerFileName.split(" & ");	
 	    				if(Installers.length>1){			 
 	    					project.setProperty("FirstInstaller",Installers[0]);				
 	    					project.setProperty("SecondInstaller",Installers[1]);	
 	    					project.setProperty("InstallerFileName",Installers[0] +" & " + SecondInstaller.substring(0,SecondInstaller.lastindexOf('\')) );
-	    				}else if(installers.length==1){
+	    				}else if(Installers.length==1){
 	    					project.setProperty("InstallerFileName",Installers[0]);
 	    				}	
 	    				]]> </script>
