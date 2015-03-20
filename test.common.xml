@@ -201,23 +201,14 @@
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
 			 </if>
-			  <if>
-				<contains string="${InstallerFileName}" substring="_http"/>
-				<then>
-					<!-- Get build name from Jenkins artifacts-->
-					<var name="BuildDisplayName" value="${InstallerFileName}"/>
-					<propertyregex property="InstallerFileNameFromJenkinsArtifacts" input="${BuildDisplayName}" regexp="(.*)_" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameFromJenkinsArtifacts}"/>
-					<var name="InstallerFileNameFromJenkinsArtifacts" unset="true"/>
-					
-					<!-- Get build URL from Jenkins artifacts-->
-					<var name="BuildDisplayName" value="${InstallerFileName}"/>
-					<propertyregex property="InstallerFileNameUrl" input="${BuildDisplayName}" regexp="_(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildURL" value="${InstallerFileNameUrl}"/>
-					<var name="InstallerFileNameUrl" unset="true"/>
-					
-					<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-					<var name="BuildDisplayName" value="${InstallerFileNameFromJenkinsArtifacts}"/>
+	    			<!-- Remove suffix if the InstallerFileName is installer url -->
+	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
+	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="signed/(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
+	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+	    			<var name="InstallerFileNameWithSuffix" unset="true"/>	
+	    	
+	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
 					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
@@ -251,52 +242,11 @@
 
 					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
 
-					<echo message="Display Build version : ${DisplayInstallerFileName}"/>
-					<echo message="Build installer URL : ${InstallerFileNameUrl}"/>
+	    			
+	    			<echo message="Display Build version : ${DisplayInstallerFileName}"/>
+	    			<echo message="InstallerFileName is : ${InstallerFileName}"/>
 					<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
 					<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
-				</then>
-				<else>
-					<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-					<var name="BuildDisplayName" value="${InstallerFileName}"/>
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDataPointViewer" replace="TDPV" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
-					<var name="DisplayInstallerFileName" unset="true"/>
-
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-
-					<echo message="Display Build version : ${DisplayInstallerFileName}"/>
-					<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
-					<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
-				</else>
-			 </if>
 			<if>
 				<equals arg1="${SiteCode}" arg2="skytap"/>
 					<then>
@@ -440,7 +390,7 @@
 	
 	<target name="CopyAutomationFilesToVM">
 	<if>
-		<contains string="${InstallerFileNameUrl}" substring="_http"/>
+		<contains string="${InstallerFileNameUrl}" substring="http"/>
 		<then>
 			<echo message="InstallerFileNameUrl: ${InstallerFileNameUrl}"/>
 			<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
