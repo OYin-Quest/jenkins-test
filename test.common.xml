@@ -203,9 +203,9 @@
 			 </if>
 	    	<if>
 	    		<contains string="${InstallerFileName}" substring="http"/>
-	    		<echo message="Prepare installer name to set build display name"/>
-				<echo message="InstallerFileName is : ${InstallerFileName}"/>
 	    			<then>
+					<echo message="Prepare installer name to set build display name"/>
+					<echo message="InstallerFileName is : ${InstallerFileName}"/>
 	    				<!-- Get First and Second VM when started two VMs-->
 	    				<script language="javascript"> <![CDATA[			  
 	    				var InstallerFileName = project.getProperty("InstallerFileName");				
