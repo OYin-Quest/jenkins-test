@@ -202,32 +202,46 @@
 				</then>
 			 </if>
 	    	<if>
-	    		<contains string="${InstallerFileName}" substring="http"/>
+	    		<and>
+	    			<contains string="${InstallerFileName}" substring="http"/>
+	    			<contains string="${InstallerFileName}" substring="&amp;"/>
+	    		</and>
 	    			<then>
-					<echo message="Prepare installer name to set build display name"/>
-					<echo message="InstallerFileName is : ${InstallerFileName}"/>
-	    				<!-- Get First and Second VM when started two VMs-->
+	    				<echo message="Prepare installer name to set build display name"/>
+	    				
+	    				<!--Remove suffix if the InstallerFileName is installer url -->
+	    				<var name="InstallerNameA" value="${InstallerFileName}"/>
+	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="(.*)&amp;" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
+	    				<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
+	    				<echo message="The InstallerNameA is: ${InstallerNameA}"/>
+	    				<var name="InstallerFileNameWithSuffix" unset="true"/>	
+	    				
+	    				<var name="InstallerNameB" value="${InstallerFileName}"/>
+	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
+	    				<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+	    				<var name="InstallerNameB" value="${InstallerFileNameWithSuffix}"/>
+	    				<echo message="The InstallerNameB is: ${InstallerNameB}"/>
+	    				<var name="InstallerFileNameWithSuffix" unset="true"/>
+	    				<var name="InstallerFileName" unset="true"/>
+	    				
+	    				<!-- Get InstallerName-->
 	    				<script language="javascript"> <![CDATA[			  
-	    				var InstallerFileName = project.getProperty("InstallerFileName");	
-						var FileName = InstallerFileName.replace("/^\s+/", "");
-	    				var Installers = FileName.split("&");	
-	    				if(Installers.length>1){			 
-	    					project.setProperty("FirstInstaller",Installers[0]);				
-	    					project.setProperty("SecondInstaller",Installers[1]);	
-	    					project.setProperty("InstallerFileName",Installers[0] +" & " + SecondInstaller.substring(0,SecondInstaller.lastIndexOf('\')));
-	    				}else if(Installers.length==1){
-	    					project.setProperty("InstallerFileName",Installers[0]);
-	    				}	
+	    				var InstallerFileNameA = project.getProperty("InstallerNameA");
+	    				var InstallerFileNameB = project.getProperty("InstallerNameB");
+	    				project.setProperty("InstallerFileNameTmp",InstallerFileNameA + "& " + InstallerFileNameB);
 	    				]]> </script>
+						
+	    				<echo message="The InstallerName is: ${InstallerFileNameTmp}"/>
+	    				<var name="InstallerFileName" value="${InstallerFileNameTmp}"/>
 	    			</then>
-	    		</if>
-				<echo message="Prepare InstallerFileName is : ${InstallerFileName}"/>
-	    			<!-- Remove suffix if the InstallerFileName is installer url >
+	    	</if>
+	    	
 	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
 	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
+	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-	    			<echo message="The original BuildDisplayName is: ${BuildDisplayName}"/>
-	    			<var name="InstallerFileNameWithSuffix" unset="true"/-->
+	    			<echo message="The InstallerName is: ${InstallerFileName}"/>
+	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
 	    	
 	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
 					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
