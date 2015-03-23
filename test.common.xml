@@ -217,7 +217,7 @@
 	    				<var name="InstallerFileNameWithSuffix" unset="true"/>	
 	    				
 	    				<var name="InstallerNameB" value="${InstallerFileName}"/>
-	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
+	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
 	    				<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    				<var name="InstallerNameB" value="${InstallerFileNameWithSuffix}"/>
 	    				<echo message="The InstallerNameB is: ${InstallerNameB}"/>
