@@ -215,7 +215,19 @@
 	    				<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
 	    				<echo message="The InstallerNameA is: ${InstallerNameA}"/>
 	    				<var name="InstallerFileNameWithSuffix" unset="true"/>	
-	    				
+						
+						<if>
+							<contains string="${InstallerNameA}" substring="http"/>
+							<then>
+								<!--Remove suffix if the InstallerFileName is installer url -->
+								<var name="InstallerNameA" value="${InstallerNameA}"/>
+								<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerNameA}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerNameA}"/>
+								<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
+								<echo message="The InstallerNameA is: ${InstallerNameA}"/>
+								<var name="InstallerFileNameWithSuffix" unset="true"/>
+							</then>
+						</if>
+
 	    				<var name="InstallerNameB" value="${InstallerFileName}"/>
 	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
 	    				<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
