@@ -213,7 +213,6 @@
 	    				<var name="InstallerNameA" value="${InstallerFileName}"/>
 	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="(.*)&amp;" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
 	    				<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
-	    				<echo message="The InstallerNameA is: ${InstallerNameA}"/>
 	    				<var name="InstallerFileNameWithSuffix" unset="true"/>	
 						
 						<if>
@@ -221,9 +220,8 @@
 							<then>
 								<!--Remove suffix if the InstallerFileName is installer url -->
 								<var name="InstallerNameA" value="${InstallerNameA}"/>
-								<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerNameA}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerNameA}"/>
+								<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerNameA}" regexp="signed/(.*)" select="\1" global="true" defaultvalue="${InstallerNameA}"/>
 								<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
-								<echo message="The InstallerNameA is: ${InstallerNameA}"/>
 								<var name="InstallerFileNameWithSuffix" unset="true"/>
 							</then>
 						</if>
@@ -232,7 +230,6 @@
 	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
 	    				<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    				<var name="InstallerNameB" value="${InstallerFileNameWithSuffix}"/>
-	    				<echo message="The InstallerNameB is: ${InstallerNameB}"/>
 	    				<var name="InstallerFileNameWithSuffix" unset="true"/>
 	    				<var name="InstallerFileName" unset="true"/>
 	    				
@@ -243,7 +240,6 @@
 	    				project.setProperty("InstallerFileNameTmp",InstallerFileNameA + "& " + InstallerFileNameB);
 	    				]]> </script>
 						
-	    				<echo message="The InstallerName is: ${InstallerFileNameTmp}"/>
 	    				<var name="InstallerFileName" value="${InstallerFileNameTmp}"/>
 	    			</then>
 	    	</if>
@@ -252,7 +248,6 @@
 	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
 	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-	    			<echo message="The InstallerName is: ${InstallerFileName}"/>
 	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
 	    	
 	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
@@ -289,11 +284,8 @@
 					<var name="DisplayInstallerFileName" unset="true"/>
 
 					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-					<echo message="The final BuildDisplayName is: ${BuildDisplayName}"/>
-
-	    			
+		
 	    			<echo message="Display Build version : ${DisplayInstallerFileName}"/>
-	    			<echo message="InstallerFileName is : ${InstallerFileName}"/>
 					<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
 					<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
 			<if>
@@ -475,7 +467,6 @@
 						<var name="InstallerFileNameUrl" value="${InstallerFileName}"/>
 						<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="&amp;(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
 						<var name="InstallerFileName" value="${InstallerFileNameWithSuffix}"/>
-						<echo message="The InstallerName URL is: ${InstallerFileName}"/>
 					</then>
 				</if>
 			
