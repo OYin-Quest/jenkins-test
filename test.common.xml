@@ -201,51 +201,8 @@
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
 			 </if>
-	    	<if>
-	    		<and>
-	    			<contains string="${InstallerFileName}" substring="http"/>
-	    			<contains string="${InstallerFileName}" substring="&amp;"/>
-	    		</and>
-	    			<then>
-	    				<echo message="Prepare installer name to set build display name"/>
-	    				
-	    				<!--Remove suffix if the InstallerFileName is installer url -->
-	    				<var name="InstallerNameA" value="${InstallerFileName}"/>
-	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="(.*)&amp;" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
-	    				<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
-	    				<var name="InstallerFileNameWithSuffix" unset="true"/>	
-						
-						<if>
-							<contains string="${InstallerNameA}" substring="http"/>
-							<then>
-								<!--Remove suffix if the InstallerFileName is installer url -->
-								<var name="InstallerNameA" value="${InstallerNameA}"/>
-								<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerNameA}" regexp="signed/(.*)" select="\1" global="true" defaultvalue="${InstallerNameA}"/>
-								<var name="InstallerNameA" value="${InstallerFileNameWithSuffix}"/>
-								<var name="InstallerFileNameWithSuffix" unset="true"/>
-							</then>
-						</if>
-
-	    				<var name="InstallerNameB" value="${InstallerFileName}"/>
-	    				<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
-	    				<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-	    				<var name="InstallerNameB" value="${InstallerFileNameWithSuffix}"/>
-	    				<var name="InstallerFileNameWithSuffix" unset="true"/>
-	    				<var name="InstallerFileName" unset="true"/>
-	    				
-	    				<!-- Get InstallerName-->
-	    				<script language="javascript"> <![CDATA[			  
-	    				var InstallerFileNameA = project.getProperty("InstallerNameA");
-	    				var InstallerFileNameB = project.getProperty("InstallerNameB");
-	    				project.setProperty("InstallerFileNameTmp",InstallerFileNameA + "& " + InstallerFileNameB);
-	    				]]> </script>
-						
-	    				<var name="InstallerFileName" value="${InstallerFileNameTmp}"/>
-	    			</then>
-	    	</if>
-	    	
 	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
-	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="Signed/(.*)" select="\1" global="true" defaultvalue="${BuildDisplayName}"/>
+	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http(.*?)signed" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
 	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
 	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
@@ -457,31 +414,6 @@
 				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
 			</then>
 		</if>
-		
-		<if>		
-			<contains string="${InstallerFileName}" substring="http"/>
-			<then>
-				<if>
-					<contains string="${InstallerFileName}" substring="&amp;"/>
-					<then>
-						<var name="InstallerFileNameUrl" value="${InstallerFileName}"/>
-						<propertyregex property="InstallerFileNameWithSuffix" input="${InstallerFileName}" regexp="&amp;(.*)" select="\1" global="true" defaultvalue="${InstallerFileName}"/>
-						<var name="InstallerFileName" value="${InstallerFileNameWithSuffix}"/>
-					</then>
-				</if>
-			
-			<echo message="Download Installer from URL: ${InstallerFileName}"/>
-			<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
-			<arg value="-jar"/>
-			<arg value="DownloadInstallerFromJenkinsToVM"/> 
-			<arg value="url=${InstallerFileName}"/>
-			<classpath>
-				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
-				<pathelement path="${java.class.path}"/>
-			</classpath>
-		</java>
-		</then>
-	</if>
 	</target>
 
 	<target name="RunTestCasesOnVM">
