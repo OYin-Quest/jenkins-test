@@ -553,7 +553,7 @@
 					</if>  
 
 					<echo message="Copy dump file"/>
-					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
+					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
 						<fileset dir="C:\Windows\ServiceProfiles\LocalService">
 							<include name="*.dmp"/>
 						</fileset>
