@@ -203,7 +203,7 @@
 			 </if>
 	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
 					<echo message="InstallerFileName is : ${InstallerFileName}"/>
-	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http(.*?)signed" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
+	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http(.*?)signed/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
 	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
 	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
 	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
