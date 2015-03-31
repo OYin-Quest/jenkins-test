@@ -181,11 +181,11 @@
 							<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
 						</else>
 					</if>
+					<echo message="The Installer file name is : ${InstallerFileName}"/>
 			</then>
 		</if>
 		</else>
 		</if>
-		<echo message="The Installer file name is : ${InstallerFileName}"/>
 	</target>
 
 	<target name="SetBuildDisplayName">
