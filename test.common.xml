@@ -184,8 +184,8 @@
 			</then>
 		</if>
 		</else>
-		<echo message="The Installer file name is : ${InstallerFileName}"/>
 		</if>
+		<echo message="The Installer file name is : ${InstallerFileName}"/>
 	</target>
 
 	<target name="SetBuildDisplayName">
