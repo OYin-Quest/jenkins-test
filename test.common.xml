@@ -151,37 +151,45 @@
 	</target>
 
 	<target name="GetInstallerFileName">
-		<if>
-			<not>
-				<isset property="InstallerFileName"/>
-			</not>
-			<then>
-				<condition property="INSTALLER_NAME.Empty" else="false">
-					<or>
-						<not>
-							<isset property="INSTALLER_NAME"/>
-						</not>	
-						<equals arg1="${INSTALLER_NAME}" arg2=""/>
-					</or>
-				</condition>
-				<if>
-					<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
-					<then>
-						<echo message="Call GetLatestBuild targert to get Installler file name"/>
-						<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
-						<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
-					</then>
-					<else>
-						<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
-					</else>
-				</if>
+	 <if>
+		  <equals arg1="${ProductFamily}" arg2="DataPoint"/>
+	    <then>
+			 <echo message="ProductName is: ${ProductFamily}, skip GetLatestBuild target"/>
+		</then>
+		<else>
+			<if>
+				<not>
+					<isset property="InstallerFileName"/>
+				</not>
+				<then>
+					<condition property="INSTALLER_NAME.Empty" else="false">
+						<or>
+							<not>
+								<isset property="INSTALLER_NAME"/>
+							</not>	
+							<equals arg1="${INSTALLER_NAME}" arg2=""/>
+						</or>
+					</condition>
+					<if>
+						<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
+						<then>
+							<echo message="Call GetLatestBuild targert to get Installler file name"/>
+							<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
+							<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
+						</then>
+						<else>
+							<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
+						</else>
+					</if>
+					<echo message="The Installer file name is : ${InstallerFileName}"/>
 			</then>
 		</if>
-		<echo message="The Installer file name is : ${InstallerFileName}"/>
+		</else>
+		</if>
 	</target>
 
 	<target name="SetBuildDisplayName">
-		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
+	<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 	 <if>
 		<or>
 		     <equals arg1="${Test.Type}" arg2="E2E2"/>
