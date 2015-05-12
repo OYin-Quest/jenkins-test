@@ -189,7 +189,7 @@
 	</target>
 
 	<target name="SetBuildDisplayName">
-		<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
+	<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
 	 <if>
 		<or>
 		     <equals arg1="${Test.Type}" arg2="E2E2"/>
