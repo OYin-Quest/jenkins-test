@@ -6,7 +6,7 @@ ls -l > /home/skytap/Downloads/test.tmp
 
 # copy file from file server to Downloads
 # To check whether ssh works
-rsync suite@10.6.208.3:"/mnt/share/Share/DataHubFiles/Ocean/jenkins.xml" /home/skytap/Downloads > /home/skytap/Downloads/sudoers.txt 2>&1
+rsync -v suite@10.6.208.3:"/mnt/share/Share/DataHubFiles/Ocean/jenkins.xml" /home/skytap/Downloads > /home/skytap/Downloads/sudoers.txt 2>&1
 
 # Usually sudo command would need to input password
 # To check whether password is filled in automatically
