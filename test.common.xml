@@ -100,6 +100,7 @@
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
+		<echo message="BrowserType=${BrowserType}"/>
 	</target>
 	
 	<target name="InitJenkinsServerJobWorkSpace">
@@ -437,10 +438,10 @@
 		<if>
 			<isset property="SecondVM"/>
 			<then>
-				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},SITE_CODE=${SiteCode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},SITE_CODE=${SiteCode}&quot;"/>
 			</then>
 			<else>
-				<property name="TestParameterSet" value="&quot;${TestParameters},SITE_CODE=${SiteCode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},SITE_CODE=${SiteCode}&quot;"/>
 			</else>
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
