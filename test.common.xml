@@ -88,6 +88,7 @@
 		<echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
 		<echo message="Build URL: ${JenkinsEnv.BUILD_URL}"/>
 		<echo message="TestBranch=${TEST_BRANCH}"/>
+		<echo message="InstallerBranch=${INSTALLER_BRANCH}"/>
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
 		<echo message="AutomationVM=${AutomationVM}"/>
 		<echo message="TestGroup=${RunGroupName}"/>
