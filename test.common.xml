@@ -101,6 +101,7 @@
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
+		<echo message="StorageEngine=${StorageEngine}"/>
 		<echo message="BrowserType=${BrowserType}"/>
 		<echo message="TestType=${TEST_TYPE}"/>
 	</target>
@@ -438,10 +439,10 @@
 		<if>
 			<isset property="SecondVM"/>
 			<then>
-				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storege_Engine=${StoregeEngine}&quot;"/>
 			</then>
 			<else>
-				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storege_Engine=${StoregeEngine}&quot;"/>
 			</else>
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
