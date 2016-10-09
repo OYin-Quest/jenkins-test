@@ -101,7 +101,7 @@
 		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
-		<echo message="StorageEngine=${StoregeEngine}"/>
+		<echo message="StorageEngine=${StorageEngine}"/>
 		<echo message="DebugMode=${DebugMode}"/>
 		<echo message="BrowserType=${BrowserType}"/>
 		<echo message="TestType=${TEST_TYPE}"/>
