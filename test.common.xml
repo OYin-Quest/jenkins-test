@@ -102,6 +102,7 @@
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
 		<echo message="StorageEngine=${StorageEngine}"/>
+		<echo message="DebugMode=${DebugMode}"/>
 		<echo message="BrowserType=${BrowserType}"/>
 		<echo message="TestType=${TEST_TYPE}"/>
 	</target>
@@ -439,10 +440,10 @@
 		<if>
 			<isset property="SecondVM"/>
 			<then>
-				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storege_Engine=${StoregeEngine}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine},Debug_Mode=${DebugMode}&quot;"/>
 			</then>
 			<else>
-				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storege_Engine=${StoregeEngine}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine},Debug_Mode=${DebugMode}&quot;"/>
 			</else>
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
