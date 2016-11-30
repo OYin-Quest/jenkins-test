@@ -517,7 +517,7 @@
 
 				<echo message="Copy dump file"/>
 				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
-					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+					<fileset dir="C:\DumpFolder">
 						<include name="*.dmp"/>
 					</fileset>
 				</copy>				
@@ -572,10 +572,10 @@
 					<echo message="Copy dump file"/>
 					<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
 					<exec executable="cmd">
-						<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+						<arg line="/c dir C:\DumpFolder"/>
 					</exec>
 					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
-						<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<fileset dir="C:\DumpFolder">
 							<include name="*.dmp"/>
 						</fileset>
 					</copy>
