@@ -10,5 +10,8 @@ timestamps{
 		stage('cleanup'){
 			echo 'cleanup'
 		}
+		stage('copy'){
+			echo 'copy artifacts'
+		}
 	}
 }
