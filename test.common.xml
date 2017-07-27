@@ -406,7 +406,7 @@
 			<arg value="CopyAutomationFilesToVM"/> 
 			<arg value="testScriptDir=${Automation.TCScripts.dir}"/>
 			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
-			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir)"/>
+			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir}"/>
 			<arg value="automationDir=${Automation.Work.dir}"/>
 			<arg value="installerName=${InstallerFileName}"/>
 			<arg value="testBranch=${TEST_BRANCH}"/>
