@@ -136,6 +136,7 @@
 		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
 			<arg value="GetLatestBuild"/> 
 			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
+			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir}"/>
 			<arg value="productName=${ProductName}"/>
 			<arg value="devBranch=${INSTALLER_BRANCH}"/>
 			<classpath>
