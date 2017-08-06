@@ -139,6 +139,7 @@
 			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir}"/>
 			<arg value="productName=${ProductName}"/>
 			<arg value="devBranch=${INSTALLER_BRANCH}"/>
+			<arg value="installerName=${INSTALLER_NAME}"/>
 			<classpath>
 				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -167,6 +168,7 @@
 					<isset property="InstallerFileName"/>
 				</not>
 				<then>
+					<!-- Comment this as after removing Admin console from Bundle, it always has to get latest Admin console 
 					<condition property="INSTALLER_NAME.Empty" else="false">
 						<or>
 							<not>
@@ -186,6 +188,11 @@
 							<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
 						</else>
 					</if>
+					<echo message="The Installer file name is : ${InstallerFileName}"/>
+					-->
+					<echo message="Call GetLatestBuild targert to get Installler file name"/>
+					<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
+					<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
 					<echo message="The Installer file name is : ${InstallerFileName}"/>
 			</then>
 		</if>
