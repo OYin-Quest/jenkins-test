@@ -81,7 +81,6 @@
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
 		<echo message="StorageEngine=${StorageEngine}"/>
-		<echo message="DebugMode=${DebugMode}"/>
 		<echo message="BrowserType=${BrowserType}"/>
 		<echo message="TestType=${TEST_TYPE}"/>
 	</target>
@@ -179,40 +178,42 @@
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
 			 </if>
-	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
-	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http((?!\.exe|\.msi).)*/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
-	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
-	    	
-	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			 
+			<var name="BuildDisplayName" value="${InstallerFileName}"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http((?!\.exe|\.msi).)*/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+	
+			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
-					<var name="DisplayInstallerFileName" unset="true"/>
+			<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-		
-					<echo message="Jenkins Job Url: ${Env.JENKINS_URL}"/>
-					<echo message="Jenkins Job Name: ${Env.JOB_NAME}"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
+			<var name="DisplayInstallerFileName" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+
+			<echo message="Jenkins Job Url: ${Env.JENKINS_URL}"/>
+			<echo message="Jenkins Job Name: ${Env.JOB_NAME}"/>
+			
 			<if>
 				<equals arg1="${SiteCode}" arg2="skytap"/>
 				<then>
@@ -238,7 +239,7 @@
 				<elseif>
 					<equals arg1="${SiteCode}" arg2="azure"/>
 					<then>
-						<echo file="version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
+						<echo file="${env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
 					</then>
 				</elseif>
 				<else>
