@@ -239,7 +239,8 @@
 				<elseif>
 					<equals arg1="${SiteCode}" arg2="azure"/>
 					<then>
-						<echo file="${env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
+						<echo message="Save build name into ${Env.WORKSPACE}\version.txt"/>
+						<echo file="${Env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
 					</then>
 				</elseif>
 				<else>
