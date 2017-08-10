@@ -288,8 +288,6 @@
 				<equals arg1="${CopyAutomationFilesToVMResult}" arg2="0"/>
 			</not>
 			<then>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
-				<antcall target="PowerOffVM"/>
 				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
 			</then>
 		</if>
@@ -331,15 +329,6 @@
 		<echo message="${VBErrorMsg}"/>
 		<echo message="VBRunResultCode: ${VBRunResultCode}"/>
 		<echo message="===================VBScriptOutput end======================="/>
-		<if>
-			<not>
-				<equals arg1="${VBRunResultCode}" arg2="0"/>
-			</not>
-			<then>
-				<echo message="Calling TakeFailedSnapshotOnVM."/>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
-			</then>
-		</if>
 	</target>
 
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
