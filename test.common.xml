@@ -242,7 +242,7 @@
 						<echo message="Save build name into ${Env.WORKSPACE}\version.txt"/>
 						<echo file="${Env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
 						<propertyfile file="${Env.WORKSPACE}\test.properties">
-							<enry key="BUILD_DISPLAY_NAME" value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<entry key="BUILD_DISPLAY_NAME" value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
 						</propertyfile>
 					</then>
 				</elseif>
