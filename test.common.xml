@@ -419,7 +419,7 @@
 					<echo message="${Msg.ProdessTestResult}"/>
 				</catch>
 				<finally>
-					<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+					<!-- Use C# programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
 					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
 						<arg value='resultDir=\"${Automation.TestResults.dir}\"'/>
 						<arg value='testedApp=\"${InstallerFileName}\"'/>
