@@ -322,13 +322,12 @@
 		<echo message="------------------------------------------------------------------"/>
 		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute VBScript to run automation tests..."/>
-		<exec executable="cscript" failonerror="false" timeout="18000000" outputproperty="VBRunOutput" errorproperty="VBErrorMsg" resultproperty="VBRunResultCode">
+		<exec executable="cscript" failonerror="false" timeout="18000000" errorproperty="VBErrorMsg" resultproperty="VBRunResultCode">
 		<arg
 			line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		</exec>
 
 		<echo message="===================VBScriptOutput=========================="/>
-		<echo message="${VBRunOutput}"/>
 		<echo message="${VBErrorMsg}"/>
 		<echo message="VBRunResultCode: ${VBRunResultCode}"/>
 		<echo message="===================VBScriptOutput end======================="/>
