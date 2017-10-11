@@ -432,6 +432,7 @@
 			</trycatch>
 		 </else>
 	</if> 
+	<antcall target="CopyDumpFile" />
 	</target>
 
 	<!--Remove C:\Automation from test VM-->
@@ -455,5 +456,31 @@
 			</trycatch>
 		</then>
 	</if>
+	</target>
+	
+	<target name="CopyDumpFile">
+		<if>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
+			<then>
+				<echo message="Copy dump file"/>
+				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
+				<exec executable="cmd">
+					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+				<exec executable="cmd">
+					<arg line="/c dir C:\DumpFolder"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
+					<fileset dir="C:\DumpFolder">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+			</then>
+		</if>
 	</target>
 </project>
