@@ -475,7 +475,7 @@
 				<exec executable="cmd">
 					<arg line="/c dir C:\DumpFolder"/>
 				</exec>
-				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump" failonerror="false">
 					<fileset dir="C:\DumpFolder">
 						<include name="*.dmp"/>
 					</fileset>
