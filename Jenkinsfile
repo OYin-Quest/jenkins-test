@@ -8,17 +8,17 @@ timestamps{
 			stage('run'){
 				echo 'run'
 			}
-			stage('cleanup'){
-				echo 'cleanup'
-			}
-			stage('copy'){
-				echo 'copy artifacts'
-			}
 		} catch(error){
 			echo "catch"
 			throw error
 		} finally{
 			echo "finally"
+			stage('copy'){
+				echo 'copy artifacts'
+			}
+			stage('cleanup'){
+				echo 'cleanup'
+			}
 		}
 	}
 }
