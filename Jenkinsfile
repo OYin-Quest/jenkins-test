@@ -1,5 +1,5 @@
 timestamps{
-	node{
+	node('tcde-win7'){
 		echo "hello, world"
 		stage('Preparation'){
 			echo 'creating vm'
