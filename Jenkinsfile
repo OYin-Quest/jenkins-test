@@ -13,11 +13,11 @@ timestamps{
 			throw error
 		} finally{
 			echo "finally"
-			stage('cleanup'){
-				echo 'cleanup'
-			}
 			stage('copy'){
 				echo 'copy artifacts'
+			}
+			stage('cleanup'){
+				echo 'cleanup'
 			}
 		}
 	}
