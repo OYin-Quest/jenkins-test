@@ -4,14 +4,34 @@
 	<!--RunAutomation is main target,it call other target to run-->
 	<target name="RunAutomation"> 
 		<antcall target="EchoAntProperty"/>
-		<antcall target="InitJenkinsServerJobWorkSpace"/>
+		<antcall target="InitWorkSpace"/>
 		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
-		<antcall target="SetBuildDisplayName"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
-		<antcall target="StartVMToPrebuild"/>
-		<antcall target="CopyAutomationFilesToVM"> <param name="InstallerFileName" value="${InstallerFileName}"/> </antcall>
+		<antcall target="SetBuildDisplayName">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+		<antcall target="CopyAutomationFilesToVM">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
 		<antcall target="RunTestCasesOnVM"/>
 		<antcall target="ProcessTestCasesResults"/>
-		<antcall target="PowerOffVM"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+	
+	<target name="Preparation">
+		<antcall target="EchoAntProperty"/>
+		<antcall target="InitWorkSpace"/>
+		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
+		<antcall target="SetBuildDisplayName">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+		<antcall target="CopyAutomationFilesToVM">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+	</target>
+	
+	<target name="RunTest">
+		<antcall target="RunTestCasesOnVM"/>
+		<antcall target="ProcessTestCasesResults"/>
 		<antcall target="DeleteAutomationFilesOnVM"/>
 	</target>
 </project>

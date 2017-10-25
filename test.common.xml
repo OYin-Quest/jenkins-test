@@ -8,13 +8,6 @@
 			<contains string="${ProductName}" substring="BISuite"/>
 		</or>
 	</condition>
-
-	<condition property="Product.TDECP" else="false">
-		<or>
-			<contains string="${ProductName}" substring="TDECP"/>
-			<contains string="${ProductName}" substring="TDPV"/>
-		</or>
-	</condition>
 	
 	<condition property="Product.DataPoint" else="false">
 		<contains string="${ProductName}" substring="DataPoint"/>
@@ -31,15 +24,9 @@
 				<property name="ProductFamily" value="DataPoint"/>
 			</then>
 		</elseif>
-		<elseif>
-			<equals arg1="${Product.TDECP}" arg2="true"/>
-			<then>
-				<property name="ProductFamily" value="TDECP"/>
-			</then>
-		</elseif>
 	</if>
 
-	<property environment="JenkinsEnv"/>
+	<property environment="Env"/>
 	<property name="Automation.TestExecutable" value="TestExecute"/>
 
 	<!-- Check whether AutomationVM property exists-->
@@ -64,29 +51,22 @@
 		<else>
 			<if>
 				<not>
-					<equals arg1="${JenkinsEnv.NODE_NAME}" arg2="master" />
+					<equals arg1="${Env.NODE_NAME}" arg2="master" />
 				</not>
 				<then>
-					<property name="FirstVM" value="${JenkinsEnv.COMPUTERNAME}" />
+					<property name="FirstVM" value="${Env.COMPUTERNAME}" />
 				</then>
 			</if>
 		</else>
 	</if>
 	
-	<!--SiteCode is passed in Jenkins job's ant properties, in skytap, we don't need ESX actions anymore-->
-	<condition property="domain.prod">
-		<not>
-			<equals arg1="${SiteCode}" arg2="skytap"/>
-		</not>
-	</condition>
-	
 	<!-- .Properties file need to use above JenkinsEnv property-->
 	<property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
 	
 	<target name="EchoAntProperty">
-		<echo message="OSName: ${JenkinsEnv.COMPUTERNAME}"/>
+		<echo message="OSName: ${Env.COMPUTERNAME}"/>
 		<echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
-		<echo message="Build URL: ${JenkinsEnv.BUILD_URL}"/>
+		<echo message="Build URL: ${Env.BUILD_URL}"/>
 		<echo message="TestBranch=${TEST_BRANCH}"/>
 		<echo message="InstallerBranch=${INSTALLER_BRANCH}"/>
 		<echo message="InstallerName=${INSTALLER_NAME}"/>
@@ -98,16 +78,14 @@
 		<echo message="Automation.TCScripts.dir=${Automation.TCScripts.dir}"/>
 		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
 		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
-		<echo message="domain.prod=${domain.prod}" />
 		<echo message="ProductFamily=${ProductFamily}"/>
 		<echo message="SiteCode=${SiteCode}"/>
 		<echo message="StorageEngine=${StorageEngine}"/>
-		<echo message="DebugMode=${DebugMode}"/>
 		<echo message="BrowserType=${BrowserType}"/>
 		<echo message="TestType=${TEST_TYPE}"/>
 	</target>
 	
-	<target name="InitJenkinsServerJobWorkSpace">
+	<target name="InitWorkSpace">
 	 <if>
 		<or>
 		     <equals arg1="${Test.Type}" arg2="E2E2"/>
@@ -140,6 +118,7 @@
 			<arg value="productName=${ProductName}"/>
 			<arg value="devBranch=${INSTALLER_BRANCH}"/>
 			<arg value="installerName=${INSTALLER_NAME}"/>
+			<arg value="siteCode=${SiteCode}"/>
 			<classpath>
 				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
 				<pathelement path="${java.class.path}"/>
@@ -158,7 +137,7 @@
 
 	<target name="GetInstallerFileName">
 	 <if>
-		  <equals arg1="${ProductFamily}" arg2="DataPoint"/>
+		<equals arg1="${ProductFamily}" arg2="DataPoint"/>
 	    <then>
 			 <echo message="ProductName is: ${ProductFamily}, skip GetLatestBuild target"/>
 		</then>
@@ -168,28 +147,6 @@
 					<isset property="InstallerFileName"/>
 				</not>
 				<then>
-					<!-- Comment this as after removing Admin console from Bundle, it always has to get latest Admin console 
-					<condition property="INSTALLER_NAME.Empty" else="false">
-						<or>
-							<not>
-								<isset property="INSTALLER_NAME"/>
-							</not>	
-							<equals arg1="${INSTALLER_NAME}" arg2=""/>
-						</or>
-					</condition>
-					<if>
-						<equals arg1="${INSTALLER_NAME.Empty}" arg2="true"/>
-						<then>
-							<echo message="Call GetLatestBuild targert to get Installler file name"/>
-							<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
-							<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
-						</then>
-						<else>
-							<property name="InstallerFileName" value="${INSTALLER_NAME}"/>
-						</else>
-					</if>
-					<echo message="The Installer file name is : ${InstallerFileName}"/>
-					-->
 					<echo message="Call GetLatestBuild targert to get Installler file name"/>
 					<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
 					<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
@@ -221,79 +178,83 @@
 					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
 				</then>
 			 </if>
-	    			<var name="BuildDisplayName" value="${InstallerFileName}"/>
-	    			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http(.*?)signed/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
-	    			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-	    			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-	    			<var name="InstallerFileNameWithSuffix" unset="true"/>
-	    	
-	    			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
-					<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			 
+			<var name="BuildDisplayName" value="${InstallerFileName}"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http((?!\.exe|\.msi).)*/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+	
+			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDecisionPointPro" replace="TDECP" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadDataPointViewer" replace="TDPV" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
-		
-					<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
-					<var name="InstallerFileNameWithSuffix" unset="true"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
 
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-					<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
-					<var name="DisplayInstallerFileName" unset="true"/>
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
+			<var name="DisplayInstallerFileName" unset="true"/>
 
-					<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
-		
-					<echo message="Jenkins Job Url: ${JenkinsEnv.JENKINS_URL}"/>
-					<echo message="Jenkins Job Name: ${JenkinsEnv.JOB_NAME}"/>
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+
+			<echo message="Jenkins Job Url: ${Env.JENKINS_URL}"/>
+			<echo message="Jenkins Job Name: ${Env.JOB_NAME}"/>
+			
 			<if>
 				<equals arg1="${SiteCode}" arg2="skytap"/>
+				<then>
+					<retry retrycount="3">
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
+							<arg value="-s"/> 
+							<arg line="${Env.JENKINS_URL}"/>
+							<arg value="set-build-display-name"/>
+							<arg value="${Env.JOB_NAME}"/>
+							<arg value="${Env.BUILD_NUMBER}"/>
+							<arg value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<arg line="--username"/>
+							<arg line="${JenkinsServer.Username}"/>
+							<arg line="--password"/>
+							<arg line="${JenkinsServer.Password}"/>
+							<classpath>
+								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+								<pathelement path="${java.class.path}"/>
+							</classpath>
+						</java>
+					</retry>
+				</then>
+				<elseif>
+					<equals arg1="${SiteCode}" arg2="azure"/>
 					<then>
-						<retry retrycount="3">
-							<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
-								<arg value="-s"/> 
-								<arg line="${JenkinsEnv.JENKINS_URL}"/>
-								<arg value="set-build-display-name"/>
-								<arg value="${JenkinsEnv.JOB_NAME}"/>
-								<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-								<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
-								<arg line="--username"/>
-								<arg line="${JenkinsServer.Username}"/>
-								<arg line="--password"/>
-								<arg line="${JenkinsServer.Password}"/>
-								<classpath>
-									<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
-									<pathelement path="${java.class.path}"/>
-								</classpath>
-							</java>
-						</retry>
+						<echo message="Save build name into ${Env.WORKSPACE}\version.txt"/>
+						<echo file="${Env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
+						<propertyfile file="${Env.WORKSPACE}\test.properties">
+							<entry key="BUILD_DISPLAY_NAME" value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						</propertyfile>
 					</then>
+				</elseif>
 				<else>
 					<retry retrycount="3">
 						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
 							<arg value="-s"/> 
-							<arg line="${JenkinsEnv.JENKINS_URL}"/>
+							<arg line="${Env.JENKINS_URL}"/>
 							<arg value="set-build-display-name"/>
-							<arg value="${JenkinsEnv.JOB_NAME}"/>
-							<arg value="${JenkinsEnv.BUILD_NUMBER}"/>
-							<arg value="#${JenkinsEnv.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<arg value="${Env.JOB_NAME}"/>
+							<arg value="${Env.BUILD_NUMBER}"/>
+							<arg value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
 							<classpath>
 								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
 								<pathelement path="${java.class.path}"/>
@@ -307,107 +268,6 @@
 	 </if>
 	</target>
 
-	<!--This target for automation which is running in ESX VM, and not for smoke test which is running on slave-->
-	<target name="StartVMToPrebuild" if="domain.prod">
-		<if>
-			<!--For smoke test running on slave VM. The VM keeps on-line all the time, no need to start, just delete snapshot for it.-->
-			 <equals arg1="${Test.Type}" arg2="smoke"/>
-			 <then>
-				 <antcall target="DeleteFailedSnapshots"/>
-			 </then>
-			 <else>
-				 <if>
-					<!--Don't start VM to prebuild if job says NO-->
-					 <not>
-						 <equals arg1="${StartVMToPrebuild}" arg2="false"/>
-					 </not>
-					 <then>
-						 <echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-						 <!-- check whether need start second VM for upgrade remote test -->
-						 <if>
-							 <isset property="SecondVM"/>
-							 <then>
-								 <echo message="Start Second VM for upgrade remote tests."/>
-								 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-									 <param name="argCommand" value="start"/>
-									 <param name="AutomationExecuteVM" value="${SecondVM}"/>
-								 </antcallback>
-								 <if>
-									 <not>
-										 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-									 </not>
-									 <then>
-										 <fail message="Jenkins job failed to start automation VM ${SecondVM}."/>
-									 </then>
-								 </if>
-							 </then>
-						 </if>
-						 <!--Inside this VM start task, it contains 'DeleteFailedSnapshots' / 'RevertSnapshot' / 'StartVM' three steps.-->
-						 <echo message="Start Automation VM."/>
-						 <antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-							 <param name="argCommand" value="start"/>
-							 <param name="AutomationExecuteVM" value="${FirstVM}"/>
-						 </antcallback>
-
-						 <if>
-							 <not>
-								 <equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-							 </not>
-							 <then>
-								 <fail message="Jenkins job failed to start automation VM ${FirstVM}"/>
-							 </then>
-						 </if>
-						 <!--Why need this ipconfig & flushdns?-->
-						 <echo message="execute ipconfig /flushdns on jenkins server."/>
-						 <exec executable="cmd">
-							 <arg value="/c" />
-							 <arg value="ipconfig" />
-							 <arg value="/flushdns" />
-						 </exec>
-					 </then>
-				 </if>
-			 </else>
-		 </if>
-	</target>
-
-	<target name="DeleteFailedSnapshots" if="domain.prod">
-		<echo message="Calling ExecuteEsxCommand to start VM on ESX using powershell scripts ."/>
-		<!-- check whether need start second VM for upgrade remote test -->
-		<if>
-			<isset property="SecondVM"/>
-			<then>
-				<echo message="Start Second VM for upgrade remote tests."/>
-				<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-					<param name="argCommand" value="deletefailedsnapshots"/>
-					<param name="AutomationExecuteVM" value="${SecondVM}"/>
-				</antcallback>
-				<if>
-					<not>
-						<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-					</not>
-					<then>
-						<fail message="Failed to remove snapshot from test VM ${SecondVM}"/>
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<echo message="Delete Failed Snapshots."/>
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="deletefailedsnapshots"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Failed to remove snapshot from test VM ${FirstVM}"/>
-			</then>
-		</if>
-	</target>
-	
 	<target name="CopyAutomationFilesToVM">
 		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
 			<arg value="CopyAutomationFilesToVM"/> 
@@ -431,8 +291,6 @@
 				<equals arg1="${CopyAutomationFilesToVMResult}" arg2="0"/>
 			</not>
 			<then>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
-				<antcall target="PowerOffVM"/>
 				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
 			</then>
 		</if>
@@ -449,42 +307,29 @@
 		<if>
 			<isset property="SecondVM"/>
 			<then>
-				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine},Debug_Mode=${DebugMode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine}&quot;"/>
 			</then>
 			<else>
-				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine},Debug_Mode=${DebugMode}&quot;"/>
+				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BrowserType},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine}&quot;"/>
 			</else>
 		</if>
 		<echo message="-----------------Basic information------------------------------"/>
 		<echo>AutomationVM:                           ${FirstVM}</echo>
-		<echo>Automation.Local.dir :                  ${Automation.Local.dir}</echo>
-		<echo>Automation TestUser:                    ${Automation.TestUser}</echo>
-		<echo>Automation TestPassword:                ${Automation.TestPassword}</echo>
+		<echo>Automation.Project.dir :                ${Automation.Project.dir}</echo>
 		<echo>Automation TestExecutable:              ${Automation.TestExecutable}</echo>
 		<echo>Automation ProjectSuit:                 ${Automation.pjs}</echo>
 		<echo>Automation TestParameters:              ${TestParameterSet}</echo>
 		<echo message="------------------------------------------------------------------"/>
-		<echo message="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		<echo message="Execute VBScript to run automation tests..."/>
-		<exec executable="cscript" failonerror="false" timeout="18000000" outputproperty="VBRunOutput" errorproperty="VBErrorMsg" resultproperty="VBRunResultCode">
-		<arg
-			line="${Automation.Local.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Local.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		<exec executable="cscript" failonerror="false" timeout="18000000" errorproperty="VBErrorMsg" resultproperty="VBRunResultCode">
+			<arg line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
 		</exec>
 
 		<echo message="===================VBScriptOutput=========================="/>
-		<echo message="${VBRunOutput}"/>
 		<echo message="${VBErrorMsg}"/>
 		<echo message="VBRunResultCode: ${VBRunResultCode}"/>
 		<echo message="===================VBScriptOutput end======================="/>
-		<if>
-			<not>
-				<equals arg1="${VBRunResultCode}" arg2="0"/>
-			</not>
-			<then>
-				<echo message="Calling TakeFailedSnapshotOnVM."/>
-				<antcall target= "TakeFailedSnapshotOnVM"/>
-			</then>
-		</if>
 	</target>
 
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
@@ -522,14 +367,7 @@
 							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
 						</copy>
 					</then>
-				</if>  
-
-				<echo message="Copy dump file"/>
-				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump\${RunGroupName}">
-					<fileset dir="C:\DumpFolder">
-						<include name="*.dmp"/>
-					</fileset>
-				</copy>				
+				</if> 		
 			</try>
 			<catch>
 				<echo message="${Msg.ProdessTestResult}"/>
@@ -539,7 +377,7 @@
 				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
 					<arg value='resultDir=\"${Automation.TestResults.dir}\${Test.Type}\"'/>
 					<arg value='testedApp=\"${InstallerFileName}\"'/>
-					<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
+					<arg value="buildUrl=${Env.BUILD_URL}"/>
 					<arg value="testBranch=${TEST_BRANCH}"/>
 				</exec>
 				<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
@@ -577,27 +415,16 @@
 							</copy>
 						</then>
 					</if>  
-
-					<echo message="Copy dump file"/>
-					<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
-					<exec executable="cmd">
-						<arg line="/c dir C:\DumpFolder"/>
-					</exec>
-					<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
-						<fileset dir="C:\DumpFolder">
-							<include name="*.dmp"/>
-						</fileset>
-					</copy>
 				</try>
 				<catch>
 					<echo message="${Msg.ProdessTestResult}"/>
 				</catch>
 				<finally>
-					<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+					<!-- Use C# programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
 					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
 						<arg value='resultDir=\"${Automation.TestResults.dir}\"'/>
 						<arg value='testedApp=\"${InstallerFileName}\"'/>
-						<arg value="buildUrl=${JenkinsEnv.BUILD_URL}"/>
+						<arg value="buildUrl=${Env.BUILD_URL}"/>
 						<arg value="testBranch=${TEST_BRANCH}"/>
 					</exec>
 					<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
@@ -605,6 +432,7 @@
 			</trycatch>
 		 </else>
 	</if> 
+	<antcall target="CopyDumpFile" />
 	</target>
 
 	<!--Remove C:\Automation from test VM-->
@@ -629,100 +457,30 @@
 		</then>
 	</if>
 	</target>
-
-	<target name="PowerOffVM" if="domain.prod">
+	
+	<target name="CopyDumpFile">
 		<if>
-			<!--Not for smoke test which is running on slave VM-->
-			<not>
-				<equals arg1="${Test.Type}" arg2="smoke"/>
-			</not>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
 			<then>
-				<if>
-					<!--Usually will power off VM by default unless job says NO-->
-					<not>
-						<equals arg1="${PowerOffVM}" arg2="false"/>
-					</not>
-					<then>
-						<!-- check whether need shut down second VM for upgrade remote test -->
-						<if>
-							<isset property="SecondVM"/>
-							<then>
-								<echo message="Shut down Second VM:${SecondVM}"/>
-								<antcall target="PowerOffAllAutomationVMOnEsx">
-									<param name="FirstVM" value="${SecondVM}"/>
-								</antcall>
-							</then>
-						</if>
-						<echo message="Shut down the Automation VM:${FirstVM}"/>
-
-						<antcall target="PowerOffAllAutomationVMOnEsx"/>
-					</then>
-					<!--If not power off VM, then need to clean up automation work directory for next job-->
-					<else>
-						<antcall target="DeleteAutomationFilesOnVM"/>
-					</else>
-				</if>
+				<echo message="Copy dump file"/>
+				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
+				<exec executable="cmd">
+					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+				<exec executable="cmd">
+					<arg line="/c dir C:\DumpFolder"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump" failonerror="false">
+					<fileset dir="C:\DumpFolder">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
 			</then>
 		</if>
-	</target>
-
-	<target name="TakeFailedSnapshotOnVM" if="domain.prod">
-		<echo message="Calling ExecuteEsxCommand."/>
-		<antcall target="ExecuteEsxCommand">
-			<param name="argCommand" value="snapshotfailure"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcall>
-	</target>
-
-	<target name="ExecuteEsxCommand" if="domain.prod">
-		<echo message="================================================"/>
-		<echo message="argCommand    ${argCommand}" />
-		<echo message="AutomationVM  ${AutomationExecuteVM}"/>
-		<echo message="ESX_NAME      ${ESX_NAME}"/>
-		<echo message="ESX_USERNAME  ${ESX_USERNAME}"/>
-		<echo message="ESX_PASSWORD  ${ESX_PASSWORD}"/>	
-		<echo message="================================================"/>
-		<exec dir="${Automation.AntScripts.dir}" executable="powershell" failonerror="false" errorproperty="ErrorMessage" resultproperty="PowerShellErrorCode">
-			<arg value="-File"/>
-			<arg value="ESXUtilities.ps1"/>
-			<arg value="${argCommand}"/>
-			<arg value="${AutomationExecuteVM}"/>
-			<arg value="${ESX_NAME}"/>
-			<arg value="${ESX_USERNAME}"/>
-			<arg value="${ESX_PASSWORD}"/>   
-		</exec>
-
-		<echo message="${ErrorMessage}"/>
-		<property name="EsxCommandReturnCode" value="${PowerShellErrorCode}"/>
-	</target>
-
-	<target name="PowerOffAllAutomationVMOnEsx" if="domain.prod">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="shutdown"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-
-		<if>
-			<not>
-				<equals arg1="${EsxCommandReturnCode}" arg2="0"/>
-			</not>
-			<then>
-				<fail message="Failed to power off ${FirstVM}"/>
-			</then>
-		</if>
-	</target>
-
-	<target name="DeletePrebuild" if="domain.prod">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="deleteprebuild"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
-	</target>
-
-	<target name="CreatePrebuild" if="domain.prod">
-		<antcallback target="ExecuteEsxCommand" return="EsxCommandReturnCode">
-			<param name="argCommand" value="createprebuild"/>
-			<param name="AutomationExecuteVM" value="${FirstVM}"/>
-		</antcallback>
 	</target>
 </project>
