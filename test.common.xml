@@ -459,10 +459,10 @@
 	</target>
 	
 	<target name="CopyDumpFile">
+		<echo message="Copy dump file"/>
 		<if>
 			<equals arg1="${SiteCode}" arg2="skytap"/>
 			<then>
-				<echo message="Copy dump file"/>
 				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
 				<exec executable="cmd">
 					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
@@ -481,6 +481,25 @@
 					</fileset>
 				</copy>
 			</then>
+			<else>
+				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
+				<exec executable="cmd">
+					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+				</exec>
+				<copy todir="\\10.240.41.132\devshare\reports\tic\dumpfiles">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+				<exec executable="cmd">
+					<arg line="/c dir C:\DumpFolder"/>
+				</exec>
+				<copy todir="\\10.240.41.132\devshare\reports\tic\dumpfiles" failonerror="false">
+					<fileset dir="C:\DumpFolder">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+			</else>
 		</if>
 	</target>
 </project>
