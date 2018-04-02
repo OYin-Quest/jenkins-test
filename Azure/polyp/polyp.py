@@ -125,7 +125,7 @@ def get_filters(repo):
                 tag = repo.get_git_ref('tags/'+tagname)
                 verbose('%s is closed at %s', branch.name, tag.object.sha)
                 if branch.commit.sha != tag.object.sha:
-                    info('%s does not point to the tip of %s', tagname, branch.name)
+                    verbose('%s does not point to the tip of %s', tagname, branch.name)
             except GithubException as e:
                 if e.status == 404:
                     yield branch
@@ -136,7 +136,7 @@ def get_filters(repo):
         topics,
         closed,
         recent,
-        bugs,
+        # bugs,
         diverged,
         nonrelease,
     ]
@@ -174,7 +174,7 @@ if __name__ == '__main__':
             info('%s', c.commit.message)
         except GithubException as e:
             if e.status == 409:
-                info('Could not merge %s into %s: %s', args.commitish, b.name, e.message)
+                info('Could not merge %s into %s: %s (%s)', args.commitish, b.name, e.data['message'], b.commit.author.name)
                 conflicts = conflicts + 1
             else:
                 raise
