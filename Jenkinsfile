@@ -52,9 +52,16 @@ properties([
 ])
 
 timestamps{
-	withWorkspace(env.label, 'TCDE'){	
+	withWorkspace('auto7', 'TCDE'){	
+		env.PROPERTY_APIKEY = '-H "X-JFrog-Art-Api:AKCp2WY1Kb9Xs68829rBntbPZg6oKe4vA4JvXSAp4WDn3FGCaaT4bChMxgpHBzQCUqmomp7yD"'
+		
 		// Using the 'stage' step without a block argument is deprecated
 		stage('CheckOut Source Code'){
+			bat "mkdir C:\\Tools\\QSFTSSH > nul || echo bypass error"
+			bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa -o C:\\Tools\\QSFTSSH\\id_rsa"
+			bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa.pub -o C:\\Tools\\QSFTSSH\\id_rsa.pub"
+			bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/known_hosts -o C:\\Tools\\QSFTSSH\\known_hosts"
+		
 			bat "xcopy c:\\Tools\\QSFTSSH ${env.USERPROFILE}\\.ssh /I /Y"
 			bat "RD /S /Q . > nul || echo bypass error"
 			def testRepo = 'TCDE'
