@@ -332,6 +332,31 @@
 		<echo message="===================VBScriptOutput end======================="/>
 	</target>
 
+	<target name="RunTestCasesInPython">
+		<echo message="-----------------Error code information--------------------------"/>
+		<echo message="if cmd returns 0,it means testcase run successful!"/>
+		<echo message="-----------------------------------------------------------------"/>
+		<!-- check whether need start second VM for upgrade remote test -->
+		<echo file="${Automation.Project.dir}\TICAC\TestParameters.txt">${TestParameters},Browser_Type=${BROWSER_TYPE},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode}</echo>
+
+		<exec executable="cmd" failonerror="true">
+			<arg line="${Automation.Project.dir}\WebConfig\InstallPython.bat ${SiteCode}"/>
+		</exec>
+		
+		<exec executable="cmd" failonerror="true">
+			<arg line="${Automation.Project.dir}\WebConfig\InstallSelenium.bat ${SiteCode}"/>
+		</exec>
+		
+		<exec executable="cmd" failonerror="false" timeout="18000000" errorproperty="cmdErrorMsg" resultproperty="cmdRunResultCode">
+			<arg line="${Automation.Project.dir}\A_File\RunWebTest.bat"/>
+		</exec>
+		
+		<echo message="===================cmdScriptOutput=========================="/>
+		<echo message="${cmdErrorMsg}"/>
+		<echo message="cmdRunResultCode: ${cmdRunResultCode}"/>
+		<echo message="===================cmdScriptOutput end======================="/>
+	</target>
+	
 	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
 	<target name="ProcessTestCasesResults">
 	<if>
