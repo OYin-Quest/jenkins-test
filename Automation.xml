@@ -37,7 +37,7 @@
 	
 	<target name="RunTestInPython">
 		<antcall target="RunTestCasesInPython"/>
-		<antcall target="ProcessTestCasesResults"/>
+		<antcall target="CopyDumpFile"/>
 		<antcall target="DeleteAutomationFilesOnVM"/>
 	</target>
 </project>
