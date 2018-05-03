@@ -340,11 +340,7 @@
 		<echo file="${Automation.Project.dir}\TICAC\TestParameters.txt">${TestParameters},Browser_Type=${BROWSER_TYPE},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode}</echo>
 
 		<exec executable="cmd" failonerror="true">
-			<arg line="/C ${Automation.Project.dir}\WebConfig\InstallPython.bat ${SiteCode}"/>
-		</exec>
-		
-		<exec executable="cmd" failonerror="true">
-			<arg line="/C ${Automation.Project.dir}\WebConfig\InstallSelenium.bat ${SiteCode}"/>
+			<arg line="/C ${Automation.Project.dir}\WebConfig\PrepareWebTest.bat ${SiteCode} ${BROWSER_TYPE}"/>
 		</exec>
 		
 		<exec executable="cmd" failonerror="false" timeout="18000000" errorproperty="cmdErrorMsg" resultproperty="cmdRunResultCode">

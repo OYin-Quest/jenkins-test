@@ -71,13 +71,13 @@ timestamps{
 			}
 			
 			stage('Run Tests'){
-				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} -DINSTALLER_NAME=${env.INSTALLER_NAME} -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure -DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3 Preparation"
+				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} \"-DINSTALLER_NAME=${env.INSTALLER_NAME}\" -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure \"-DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3\" Preparation"
 				
 				setBuildName()
 				
 				bat 'dir'
 				
-				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} -DINSTALLER_NAME=${env.INSTALLER_NAME} -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure -DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3 RunTestInPython"
+				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} \"-DINSTALLER_NAME=${env.INSTALLER_NAME}\" -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure \"-DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3\" RunTestInPython"
 				
 				bat 'dir'
 				
