@@ -56,30 +56,27 @@ timestamps{
 		try{
 			env.PROPERTY_APIKEY = '-H "X-JFrog-Art-Api:AKCp2WY1Kb9Xs68829rBntbPZg6oKe4vA4JvXSAp4WDn3FGCaaT4bChMxgpHBzQCUqmomp7yD"'
 			
-			// Using the 'stage' step without a block argument is deprecated
+			// Using the 'stage' step without a block argument is deprecated.
 			stage('CheckOut Source Code'){
+				// Copy SSH keys for git clone.
 				bat "mkdir C:\\Tools\\QSFTSSH > nul || echo bypass error"
 				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa -o C:\\Tools\\QSFTSSH\\id_rsa"
 				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa.pub -o C:\\Tools\\QSFTSSH\\id_rsa.pub"
 				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/known_hosts -o C:\\Tools\\QSFTSSH\\known_hosts"
 			
-				bat "xcopy c:\\Tools\\QSFTSSH ${env.USERPROFILE}\\.ssh /I /Y"
+				bat "xcopy C:\\Tools\\QSFTSSH ${env.USERPROFILE}\\.ssh /I /Y"
 				bat "RD /S /Q . > nul || echo bypass error"
 				def testRepo = 'TCDE'
 				def testBranch = getTestBranch(testRepo, env.TEST_BRANCH)
 				checkoutBranch(testRepo, testBranch)
 			}
 			
-			stage('Run Tests'){
+			stage('Run Tests'){			
 				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} \"-DINSTALLER_NAME=${env.INSTALLER_NAME}\" -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure \"-DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3\" Preparation"
 				
 				setBuildName()
 				
-				bat 'dir'
-				
 				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} \"-DINSTALLER_NAME=${env.INSTALLER_NAME}\" -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure \"-DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3\" RunTestInPython"
-				
-				bat 'dir'
 				
 				bat 'type C:\\AutomationLog\\tic_pythontest.log'
 			}
@@ -89,22 +86,18 @@ timestamps{
 			throw error
 		} finally{
 			archiveArtifacts allowEmptyArchive: true, artifacts: 'env.txt,test.properties,TestResults/Support_Bundle/*.*'
-				
-			publishHTML([
-						allowMissing: false, 
-						alwaysLinkToLastBuild: false, 
-						keepAll: true, 
-						reportDir: 'TestResults/Support_Bundle/webhtml', 
-						reportFiles: 'webtest.html', 
-						reportName: 'HTML Report', 
-						reportTitles: ''
-						])
-			
-			junit 'TestResults/Support_Bundle/weblog/web_junit_result.xml'
-			
-			notifySlack()
-			
-			closeSlaveVM()
+			try{
+				// Below two publish reports would throw error and mark build failed.
+				publishHTMLReport()
+				publishJUnitReport()
+			} catch(postError){
+				currentBuild.result = "FAILURE"
+				throw postError
+			} finally{
+				// Close slave VM in the end.
+				notifySlack()
+				closeSlaveVM()
+			}
 		}
 	}
 }
@@ -134,7 +127,6 @@ def isBranchExist(def repo, def branch){
 
 def checkoutBranch(def repo, def branch){
 	echo "Checkout branch: ${branch} from repository: ${repo}"
-
 	bat 'git config --global user.email "intersect.build@quest.com"'
 	bat 'git config --global user.name "Intersect Builder"'
 	git branch: "${branch}", credentialsId: 'github-tic', url: "git@github.com:QSFT/${repo}.git"
@@ -143,6 +135,22 @@ def checkoutBranch(def repo, def branch){
 def setBuildName(){
 	def buildName = readFile 'version.txt'
 	currentBuild.displayName = buildName
+}
+
+def publishHTMLReport(){
+	publishHTML([
+				allowMissing: false, 
+				alwaysLinkToLastBuild: false, 
+				keepAll: true, 
+				reportDir: 'TestResults/Support_Bundle/webhtml', 
+				reportFiles: 'webtest.html', 
+				reportName: 'HTML Report', 
+				reportTitles: ''
+				])
+}
+
+def publishJUnitReport(){
+	junit 'TestResults/Support_Bundle/weblog/web_junit_result.xml'
 }
 
 def closeSlaveVM(){
