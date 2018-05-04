@@ -60,11 +60,11 @@ timestamps{
 			stage('CheckOut Source Code'){
 				// Copy SSH keys for git clone.
 				bat "mkdir C:\\Tools\\QSFTSSH > nul || echo bypass error"
-				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa -o C:\\Tools\\QSFTSSH\\id_rsa"
-				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa.pub -o C:\\Tools\\QSFTSSH\\id_rsa.pub"
-				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/known_hosts -o C:\\Tools\\QSFTSSH\\known_hosts"
+				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa -o C:\\Tools\\QSFTSSH\\id_rsa > nul"
+				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/id_rsa.pub -o C:\\Tools\\QSFTSSH\\id_rsa.pub > nul"
+				bat "curl ${env.PROPERTY_APIKEY} https://artifactory.labs.quest.com/toad-intelligence-central/Components/QSFT/known_hosts -o C:\\Tools\\QSFTSSH\\known_hosts > nul"
 			
-				bat "xcopy C:\\Tools\\QSFTSSH ${env.USERPROFILE}\\.ssh /I /Y"
+				bat "xcopy C:\\Tools\\QSFTSSH ${env.USERPROFILE}\\.ssh /I /Y > nul"
 				bat "RD /S /Q . > nul || echo bypass error"
 				def testRepo = 'TCDE'
 				def testBranch = getTestBranch(testRepo, env.TEST_BRANCH)
@@ -79,6 +79,9 @@ timestamps{
 				bat "ant -file \"test\\Jenkins Build Scripts\\Automation.xml\" -DINSTALLER_BRANCH=${env.INSTALLER_BRANCH} \"-DINSTALLER_NAME=${env.INSTALLER_NAME}\" -DTEST_BRANCH=${env.TEST_BRANCH} -DINSTALLER_VERSION=${env.INSTALLER_VERSION}  -DTEST_TYPE=${env.TEST_TYPE} -DBROWSER_TYPE=${env.BROWSER_TYPE} -DSiteCode=azure \"-DProductName=TICBundle${env.INSTALLER_VERSION},TICAC4.3\" RunTestInPython"
 				
 				bat 'type C:\\AutomationLog\\tic_pythontest.log'
+				
+				// Copy test results to workspace
+				bat "XCOPY C:\\Automation\\TestResults \"${env.WORKSPACE}\\TestResults\" /S /I /Y > nul"
 			}
 			currentBuild.result = "SUCCESS"
 		} catch(error){
@@ -137,6 +140,18 @@ def setBuildName(){
 	currentBuild.displayName = buildName
 }
 
+def notifySlack(){
+    def color = 'good'
+    if (currentBuild.result == "SUCCESS"){
+        color = "good"
+    } else if (currentBuild.result == "FAILURE"){
+        color = "danger"
+    } else {
+        color = "warning"
+    }
+    slackSend channel: '#tic-ci', color: "${color}", message: "Jenkins build is ${currentBuild.result}: ${currentBuild.rawBuild.project.fullDisplayName} #${env.BUILD_NUMBER} (<${env.RUN_DISPLAY_URL}|Open>)", tokenCredentialId: 'SLACK_JENKINS_TIC_TOKEN'
+}
+
 def publishHTMLReport(){
 	publishHTML([
 				allowMissing: false, 
@@ -155,13 +170,12 @@ def publishJUnitReport(){
 
 def closeSlaveVM(){
 	// add test code branch info
-	manager.addShortText("${manager.build.buildVariables.get('TEST_BRANCH')}")
+	manager.addShortText(env.TEST_BRANCH)
 
 	// delete slave node
 	for (slave in hudson.model.Hudson.instance.slaves) {
-		manager.listener.logger.println("Found slave node ${slave.name}")
-		if (slave.name == manager.envVars["NODE_NAME"]) {
-			manager.listener.logger.println("Delete slave node ${slave.name}")
+		if (slave.name == env.NODE_NAME) {
+			echo "Delete slave node ${slave.name}"
 			slave.getComputer().doDoDisconnect("Job finished.")
 			slave.getComputer().doDoDelete()
 		}
