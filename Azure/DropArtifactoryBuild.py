@@ -2,6 +2,7 @@
 # Author    :   oyin
 #
 # Created   :   24/03/2018
+# Modified  :   05/07/2018  Update to use TLSv1.2
 # Copyright :   (c) oyin 2018
 #-------------------------------------------------------------------------------
 
@@ -9,14 +10,16 @@ import ast
 import datetime
 import os
 import re
+import ssl
 import sys
 import urllib
 import urllib2
 
 
-baseurl = 'https://artifactory.labs.quest.com/artifactory'
-username = 'ticbuild'
-password = 'AP2m78TmyafgRZs3VNowfAv8Jj7'
+baseurl = 'https://artifactory.labs.quest.com'
+header = {'X-JFrog-Art-Api':'AKCp2WY1Kb9Xs68829rBntbPZg6oKe4vA4JvXSAp4WDn3FGCaaT4bChMxgpHBzQCUqmomp7yD'}
+
+ctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
 
 ticPath      = 'toad-intelligence-central/tic'
 webPath      = 'toad-intelligence-central/webserver'
@@ -24,16 +27,7 @@ bundlePath   = 'toad-intelligence-central/bundle'
 
 
 def buildListUrl(folderPath):
-    return '{0}/api/storage/{1}?list&deep=1&listFolders=1'.format(baseurl, folderPath)
-
-
-def set_artifactory_authentication():
-
-    manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    manager.add_password(None, baseurl, username, password)
-    auth = urllib2.HTTPBasicAuthHandler(manager)
-    opener = urllib2.build_opener(auth)
-    urllib2.install_opener(opener)
+    return '{0}/artifactory/api/storage/{1}?list&deep=1&listFolders=1'.format(baseurl, folderPath)
 
 
 def quote_url(requestUrl):
@@ -93,30 +87,28 @@ def deleteArtifactory():
     for itm in branchInstallerCountDic:
         if branchInstallerCountDic[itm] == 0:
             requestUri = '{0}/{1}/{2}'.format(baseurl, productPath, itm)
-            request = urllib2.Request(requestUri)
+            request = urllib2.Request(requestUri, headers=header)
             request.get_method = lambda : 'DELETE'
             try:
                 print 'Delete path {0}'.format(requestUri)
-                response = urllib2.urlopen(request)
+                # Create a new SSLContext to bypass verification, be default newly created contexts use CERT_NONE.
+                response = urllib2.urlopen(request, context=ctx)
                 if response.code != 204:
                     print 'Failed to delete {0} with code {1}'.format(itm, str(response.code))
             except urllib2.HTTPError as ex:
                 print 'Throw exception: {0}'.format(ex)
-                if ex.code == 401:
-                    set_artifactory_authentication()
 
 
 # Keep maximum <mBuildsToKeep> builds within <nDaysToKeep> days
 def removeOldBuilds(artifactoryUrl, mBuildsToKeep, nDaysToKeep):
     print '\r\n>>> Remove build from {0}/{1}:\n'.format(baseurl, productPath)
-    set_artifactory_authentication()
-    response = urllib2.urlopen(quote_url(artifactoryUrl))
+    request = urllib2.Request(quote_url(artifactoryUrl), headers=header)
+    # Create a new SSLContext to bypass verification, be default newly created contexts use CERT_NONE.
+    response = urllib2.urlopen(request, context=ctx)
     responseStr = response.read().decode('utf-8').replace('"folder" : true', '"folder" : True').replace('"folder" : false', '"folder" : False')
     responseObj = ast.literal_eval(responseStr)
 
     for file in responseObj['files']:
-        if file['uri'] == '/master/4.5.0.85':
-            print file
         uri = file['uri']
         branchName = getBranchName(uri)
         branchAndVersion = getBranchAndVersion(uri)
