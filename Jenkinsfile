@@ -1,5 +1,5 @@
 timestamps{
-	node('tcde-win7'){
+	node{
 		try{
 			echo "hello, world"
 			stage('Preparation'){
@@ -7,6 +7,10 @@ timestamps{
 			}
 			stage('run'){
 				echo 'run'
+			}
+			
+			stage('deploy'){
+				echo 'deploy'
 			}
 		} catch(error){
 			echo "catch"
