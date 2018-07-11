@@ -1,0 +1,526 @@
+<project name="common">
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+	<condition property="Product.TIC" else="false">
+		<or>
+			<contains string="${ProductName}" substring="TIC"/>
+			<contains string="${ProductName}" substring="BISuite"/>
+		</or>
+	</condition>
+	
+	<condition property="Product.DataPoint" else="false">
+		<contains string="${ProductName}" substring="DataPoint"/>
+	</condition>
+
+	<if>
+		<equals arg1="${Product.TIC}" arg2="true"/>
+		<then>
+			<property name="ProductFamily" value="TIC"/>
+		</then>
+		<elseif>
+			<equals arg1="${Product.DataPoint}" arg2="true"/>
+			<then>
+				<property name="ProductFamily" value="DataPoint"/>
+			</then>
+		</elseif>
+	</if>
+
+	<property environment="Env"/>
+	<property name="Automation.TestExecutable" value="TestExecute"/>
+
+	<!-- Check whether AutomationVM property exists-->
+	<if>
+		<isset property="AutomationVM"/>
+		<then>
+			<!-- Get First and Second VM when started two VMs-->
+			<script language="javascript"> <![CDATA[			  
+			var AutomationVMTmp = project.getProperty("AutomationVM");				
+			var VMs = AutomationVMTmp.split("&");	
+			if(VMs.length>1){			 
+				project.setProperty("FirstVM",VMs[0]);				
+				project.setProperty("SecondVM",VMs[1]);	
+			}else if(VMs.length==1){
+				project.setProperty("FirstVM",VMs[0]);
+			}
+			]]> </script>
+		</then>
+		<!-- We should not fail job if AutomationVM is not set, 
+			this is because for multi-configuration jobs, the user-defined axis AutomationVM only works for its sub jobs, but not for itself.
+			If we fail job here, then we might see a multi-configuration job fails as 'AutomationVM not set', but with its sub jobs all passed.-->
+		<else>
+			<if>
+				<not>
+					<equals arg1="${Env.NODE_NAME}" arg2="master" />
+				</not>
+				<then>
+					<property name="FirstVM" value="${Env.COMPUTERNAME}" />
+				</then>
+			</if>
+		</else>
+	</if>
+	
+	<!-- .Properties file need to use above JenkinsEnv property-->
+	<property file="./${SiteCode}/Build_${ProductFamily}.Properties"/>
+	
+	<target name="EchoAntProperty">
+		<echo message="OSName: ${Env.COMPUTERNAME}"/>
+		<echo message="Job WorkSpace: ${JobWorkSpace.dir}"/>
+		<echo message="Build URL: ${Env.BUILD_URL}"/>
+		<echo message="TestBranch=${TEST_BRANCH}"/>
+		<echo message="InstallerBranch=${INSTALLER_BRANCH}"/>
+		<echo message="InstallerName=${INSTALLER_NAME}"/>
+		<echo message="AutomationVM=${AutomationVM}"/>
+		<echo message="TestGroup=${RunGroupName}"/>
+		<echo message="TestTool=${Automation.TestExecutable}"/>
+		<echo message="Automation.AntUtilities.Dir=${Automation.AntUtilities.dir}"/>
+		<echo message="Automation.AntScripts.dir=${Automation.AntScripts.dir}"/>
+		<echo message="Automation.TCScripts.dir=${Automation.TCScripts.dir}"/>
+		<echo message="Automation.Work.Dir=${Automation.Work.dir}"/>
+		<echo message="AutomationProjectDir=${Automation.Project.dir}"/>
+		<echo message="ProductFamily=${ProductFamily}"/>
+		<echo message="SiteCode=${SiteCode}"/>
+		<echo message="StorageEngine=${StorageEngine}"/>
+		<echo message="BrowserType=${BROWSER_TYPE}"/>
+		<echo message="TestType=${TEST_TYPE}"/>
+	</target>
+	
+	<target name="InitWorkSpace">
+	 <if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			<echo message="This is the E2E job, do not need to clean up previous test results"/>
+		</then>
+		<else>
+			<trycatch property="Msg.DeleteTestResult">
+				<try>
+					<echo message="Clean up previous test results in: ${Automation.TestResults.dir}"/>
+					<delete includeemptydirs="true">
+						<fileset dir="${Automation.TestResults.dir}" includes="**/*"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteTestResult}" />
+				</catch>
+			</trycatch>
+		</else>
+	</if>
+	</target>
+
+	<target name="GetLatestBuild">
+		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" outputproperty="JenkinsServerLatestBuild">
+			<arg value="GetLatestBuild"/> 
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
+			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir}"/>
+			<arg value="productName=${ProductName}"/>
+			<arg value="devBranch=${INSTALLER_BRANCH}"/>
+			<arg value="installerName=${INSTALLER_NAME}"/>
+			<arg value="siteCode=${SiteCode}"/>
+			<classpath>
+				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
+				<pathelement path="${java.class.path}"/>
+			</classpath>
+		</java>
+		<property name ="LatestBuildWithVersion" value="${JenkinsServerLatestBuild}"/>
+		<echo message="Latest Build Version is : ${LatestBuildWithVersion}"/>
+		
+		<if>
+			<equals arg1="${LatestBuildWithVersion}" arg2="Non Exist"/>
+			<then>
+				<fail message="Failed to get latest build for ${ProductName} from ${FileServer.ProductInstaller.dir}!"/>
+			</then>
+		</if> 
+	</target>
+
+	<target name="GetInstallerFileName">
+	 <if>
+		<equals arg1="${ProductFamily}" arg2="DataPoint"/>
+	    <then>
+			 <echo message="ProductName is: ${ProductFamily}, skip GetLatestBuild target"/>
+		</then>
+		<else>
+			<if>
+				<not>
+					<isset property="InstallerFileName"/>
+				</not>
+				<then>
+					<echo message="Call GetLatestBuild targert to get Installler file name"/>
+					<antcallback target="GetLatestBuild" return="LatestBuildWithVersion"/>
+					<property name="InstallerFileName" value="${LatestBuildWithVersion}"/>
+					<echo message="The Installer file name is : ${InstallerFileName}"/>
+			</then>
+		</if>
+		</else>
+		</if>
+	</target>
+
+	<target name="SetBuildDisplayName">
+	<!-- Call target GetInstallerFileName to get Installer file name, only the parent job of Matrix job do this -->
+	 <if>
+		<or>
+		     <equals arg1="${Test.Type}" arg2="E2E2"/>
+			 <equals arg1="${Test.Type}" arg2="E2E3"/>
+		</or>
+	    <then>
+			 <echo message="The build display name is already set"/>
+		</then>
+	    <else>
+			  <if>
+				 <or>
+					 <equals arg1="${InstallerFileName}" arg2="$${InstallerFileName}"/>
+					 <equals arg1="InstallerFileName" arg2=""/>
+				 </or>
+				 <then>
+					<echo message="Call target GetInstallerFileName to get Installer name"/>
+					<antcallback target="GetInstallerFileName" return="InstallerFileName" />
+				</then>
+			 </if>
+			 
+			<var name="BuildDisplayName" value="${InstallerFileName}"/>
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="http((?!\.exe|\.msi).)*/" replace="" casesensitive="false" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+	
+			<!-- Replace product full name with product prefix and remove suffix if the InstallerFileName is installer full name -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadBISuiteInstaller" replace="BISuite" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralServerInstaller" replace="TICBundle" global="true" defaultvalue="${BuildDisplayName}"/>
+			<!-- Since a property value cannot be set value twice, so we have to save its value and unset it-->
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<!-- ToadIntelligenceCentralAdminConsole contains sub string ToadIntelligenceCentral, so we replace ToadIntelligenceAdminConsole at first -->
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentralAdminConsole" replace="TICAC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="InstallerFileNameWithSuffix" input="${BuildDisplayName}" regexp="ToadIntelligenceCentral" replace="TIC" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${InstallerFileNameWithSuffix}"/>
+			<var name="InstallerFileNameWithSuffix" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".exe" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+			<var name="BuildDisplayName" value="${DisplayInstallerFileName}"/>
+			<var name="DisplayInstallerFileName" unset="true"/>
+
+			<propertyregex property="DisplayInstallerFileName" input="${BuildDisplayName}" regexp=".msi" replace="" global="true" defaultvalue="${BuildDisplayName}"/>
+
+			<echo message="Jenkins Job Url: ${Env.JENKINS_URL}"/>
+			<echo message="Jenkins Job Name: ${Env.JOB_NAME}"/>
+			
+			<if>
+				<equals arg1="${SiteCode}" arg2="skytap"/>
+				<then>
+					<retry retrycount="3">
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
+							<arg value="-s"/> 
+							<arg line="${Env.JENKINS_URL}"/>
+							<arg value="set-build-display-name"/>
+							<arg value="${Env.JOB_NAME}"/>
+							<arg value="${Env.BUILD_NUMBER}"/>
+							<arg value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<arg line="--username"/>
+							<arg line="${JenkinsServer.Username}"/>
+							<arg line="--password"/>
+							<arg line="${JenkinsServer.Password}"/>
+							<classpath>
+								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+								<pathelement path="${java.class.path}"/>
+							</classpath>
+						</java>
+					</retry>
+				</then>
+				<elseif>
+					<equals arg1="${SiteCode}" arg2="azure"/>
+					<then>
+						<echo message="Save build name into ${Env.WORKSPACE}\version.txt"/>
+						<echo file="${Env.WORKSPACE}\version.txt">#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}</echo>
+						<propertyfile file="${Env.WORKSPACE}\test.properties">
+							<entry key="BUILD_DISPLAY_NAME" value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+						</propertyfile>
+					</then>
+				</elseif>
+				<else>
+					<retry retrycount="3">
+						<java jar="${Automation.AntUtilities.dir}/jenkins-cli.jar" fork="true" failonerror="true" maxmemory="512m">
+							<arg value="-s"/> 
+							<arg line="${Env.JENKINS_URL}"/>
+							<arg value="set-build-display-name"/>
+							<arg value="${Env.JOB_NAME}"/>
+							<arg value="${Env.BUILD_NUMBER}"/>
+							<arg value="#${Env.BUILD_NUMBER} ${DisplayInstallerFileName}"/>
+							<classpath>
+								<pathelement location="${Automation.AntUtilities.dir}/jenkins-cli.jar"/>
+								<pathelement path="${java.class.path}"/>
+							</classpath>
+						</java>
+					</retry>
+				</else>
+			</if>
+			<echo message="Set build display name : ${DisplayInstallerFileName}"/>
+	    </else>
+	 </if>
+	</target>
+
+	<target name="CopyAutomationFilesToVM">
+		<java jar="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar" fork="true" failonerror="false" maxmemory="128m" resultproperty="CopyAutomationFilesToVMResult" outputproperty="CopyAutomationFilesToVMOutput">
+			<arg value="CopyAutomationFilesToVM"/> 
+			<arg value="testScriptDir=${Automation.TCScripts.dir}"/>
+			<arg value="installerDir=${FileServer.ProductInstaller.dir}"/>
+			<arg value="adminconsoleInstallerDir=${FileServer.AdminConsoleInstaller.dir}"/>
+			<arg value="automationDir=${Automation.Work.dir}"/>
+			<arg value="installerName=${InstallerFileName}"/>
+			<arg value="testBranch=${TEST_BRANCH}"/>
+			<arg value="siteCode=${SiteCode}"/>
+			<classpath>
+				<pathelement location="${Automation.AntUtilities.dir}/JenkinsFileUtils.jar"/>
+				<pathelement path="${java.class.path}"/>
+			</classpath>
+		</java>
+
+		<echo message="CopyAutomationFilesToVMResult: ${CopyAutomationFilesToVMResult}"/>
+		<echo message="CopyAutomationFilesToVMOutput: ${CopyAutomationFilesToVMOutput}"/>
+		<if>
+			<not>
+				<equals arg1="${CopyAutomationFilesToVMResult}" arg2="0"/>
+			</not>
+			<then>
+				<fail message="Cannot copy latest build version from ${FileServer.ProductInstaller.dir} to ${Automation.Work.dir}. Jenkins job will stop!"/>
+			</then>
+		</if>
+	</target>
+
+	<target name="RunTestCasesOnVM">
+		<echo message="-----------------Error code information--------------------------"/>
+		<echo message="if wscript returns 0,it means testcase run successful!"/>
+		<echo message="if wscript returns 1,it means testcase has a warning!"/>
+		<echo message="if wscript returns 2,it means testcase run failed!"/>
+		<echo message="if wscript returns 1000,it means Testcomplete was already running and testcomplete can not open the project."/>
+		<echo message="-----------------------------------------------------------------"/>
+		<!-- check whether need start second VM for upgrade remote test -->
+		<if>
+			<isset property="SecondVM"/>
+			<then>
+				<property name="TestParameterSet" value="&quot;${TestParameters},SecondVM=${SecondVM},Browser_Type=${BROWSER_TYPE},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine}&quot;"/>
+			</then>
+			<else>
+				<property name="TestParameterSet" value="&quot;${TestParameters},Browser_Type=${BROWSER_TYPE},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode},Storage_Engine=${StorageEngine}&quot;"/>
+			</else>
+		</if>
+		<echo message="-----------------Basic information------------------------------"/>
+		<echo>AutomationVM:                           ${FirstVM}</echo>
+		<echo>Automation.Project.dir :                ${Automation.Project.dir}</echo>
+		<echo>Automation TestExecutable:              ${Automation.TestExecutable}</echo>
+		<echo>Automation ProjectSuit:                 ${Automation.pjs}</echo>
+		<echo>Automation TestParameters:              ${TestParameterSet}</echo>
+		<echo message="------------------------------------------------------------------"/>
+		<echo message="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		<echo message="Execute VBScript to run automation tests..."/>
+		<exec executable="cscript" failonerror="false" timeout="18000000" errorproperty="VBErrorMsg" resultproperty="VBRunResultCode">
+			<arg line="${Automation.Project.dir}\RunGroup.vbs ${Automation.TestExecutable} ${Automation.Project.dir}\${Automation.pjs} ${TestCompleteProjectName} ${RunGroupName} ${TestParameterSet}" />
+		</exec>
+
+		<echo message="===================VBScriptOutput=========================="/>
+		<echo message="${VBErrorMsg}"/>
+		<echo message="VBRunResultCode: ${VBRunResultCode}"/>
+		<echo message="===================VBScriptOutput end======================="/>
+	</target>
+
+	<target name="RunTestCasesInPython">
+		<echo message="-----------------Error code information--------------------------"/>
+		<echo message="if cmd returns 0,it means testcase run successful!"/>
+		<echo message="-----------------------------------------------------------------"/>
+		<!-- check whether need start second VM for upgrade remote test -->
+		<echo file="${Automation.Project.dir}\TICAC\TestParameters.txt">${TestParameters},Browser_Type=${BROWSER_TYPE},Test_Type=${TEST_TYPE},SITE_CODE=${SiteCode}</echo>
+
+		<exec executable="cmd" failonerror="true">
+			<arg line="/C ${Automation.Project.dir}\A_File\PrepareWebTest.bat ${SiteCode} ${BROWSER_TYPE}"/>
+		</exec>
+		
+		<exec executable="cmd" failonerror="false" timeout="18000000" errorproperty="cmdErrorMsg" resultproperty="cmdRunResultCode">
+			<arg line="/C ${Automation.Project.dir}\A_File\RunWebTest.bat"/>
+		</exec>
+		
+		<echo message="===================cmdScriptOutput=========================="/>
+		<echo message="${cmdErrorMsg}"/>
+		<echo message="cmdRunResultCode: ${cmdRunResultCode}"/>
+		<echo message="===================cmdScriptOutput end======================="/>
+	</target>
+	
+	<!--Keep in mind that this ant is being executed on Jenkins server, not in test VM, so we need a network path to copy log files-->
+	<target name="ProcessTestCasesResults">
+	<if>
+		<!--For E2E test running in Skytap.-->
+		<contains string="${Test.Type}" substring="E2E"/>
+		<then>
+			<trycatch property="Msg.ProdessTestResult">
+			<try>
+				<!-- Copy the raw automation logs to a folder under job workspace. -->
+				<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}\${Test.Type}"/>
+				<copy todir="${Automation.TestResults.dir}\${Test.Type}" flatten="true" overwrite="true">
+					<fileset dir="${Automation.Project.dir}">
+						<include name="**/Log/**/{*}"/>
+					</fileset>
+				</copy>
+
+				<!-- Copy the TestComplete converted log to a folder under job workspace. -->
+				<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+				<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\${Test.Type}\html"/>
+				<copy todir="${Automation.TestResults.dir}\${Test.Type}/html">
+					<fileset dir="${Automation.ConvertedLog.dir}"/>
+				</copy>
+
+				<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
+				<if>
+					<or>
+						<equals arg1="${Product.TIC}" arg2="true"/>
+						<equals arg1="${Product.TDECP}" arg2="true"/>
+					</or>
+					<then>
+						<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\${Test.Type}\Support_Bundle" />
+						<copy todir="${Automation.TestResults.dir}\${Test.Type}/Support_Bundle">
+							<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
+						</copy>
+					</then>
+				</if> 		
+			</try>
+			<catch>
+				<echo message="${Msg.ProdessTestResult}"/>
+			</catch>
+			<finally>
+				<!-- Use Dephi programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+				<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
+					<arg value='resultDir=\"${Automation.TestResults.dir}\${Test.Type}\"'/>
+					<arg value='testedApp=\"${InstallerFileName}\"'/>
+					<arg value="buildUrl=${Env.BUILD_URL}"/>
+					<arg value="testBranch=${TEST_BRANCH}"/>
+				</exec>
+				<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
+			</finally>
+		    </trycatch>
+		</then>
+		<else>
+			<trycatch property="Msg.ProdessTestResult">
+				<try>
+					<!-- Copy the raw automation logs to a folder under job workspace. -->
+					<echo message="Copy automation raw log from ${Automation.Project.dir} to ${Automation.TestResults.dir}"/>
+					<copy todir="${Automation.TestResults.dir}" flatten="true" overwrite="true">
+						<fileset dir="${Automation.Project.dir}">
+							<include name="**/Log/**/{*}"/>
+						</fileset>
+					</copy>
+
+					<!-- Copy the TestComplete converted log to a folder under job workspace. -->
+					<!-- The TestComplte result in html format is used by Jenkins to render the job report web pages. -->
+					<echo message="Copy converted html log from ${Automation.ConvertedLog.dir} to ${Automation.TestResults.dir}\html"/>
+					<copy todir="${Automation.TestResults.dir}/html">
+						<fileset dir="${Automation.ConvertedLog.dir}"/>
+					</copy>
+
+					<!-- Copy support bundle to a folder under job workspace. We can only archive files that are located in job workspace. -->	
+					<if>
+						<or>
+							<equals arg1="${Product.TIC}" arg2="true"/>
+							<equals arg1="${Product.TDECP}" arg2="true"/>
+						</or>
+						<then>
+							<echo message="Copying support bundle from ${Automation.Project.dir}\RawResultsInXml\Support to ${Automation.TestResults.dir}\Support_Bundle" />
+							<copy todir="${Automation.TestResults.dir}/Support_Bundle">
+								<fileset dir="${Automation.Project.dir}/RawResultsInXml/Support"/>
+							</copy>
+						</then>
+					</if>  
+				</try>
+				<catch>
+					<echo message="${Msg.ProdessTestResult}"/>
+				</catch>
+				<finally>
+					<!-- Use C# programe to convert TestComplete Raw Log from Xml into JUnit format. The JUnit format results is used by Jenkins to determine the job status. -->
+					<exec executable="${Automation.AntUtilities.dir}/TestCompleteResultsTransform.exe" failonerror="false" timeout="900000" outputproperty="ResultsTransformOutput">
+						<arg value='resultDir=\"${Automation.TestResults.dir}\"'/>
+						<arg value='testedApp=\"${InstallerFileName}\"'/>
+						<arg value="buildUrl=${Env.BUILD_URL}"/>
+						<arg value="testBranch=${TEST_BRANCH}"/>
+					</exec>
+					<echo Message="TestCompleteResultsTransform output: ${ResultsTransformOutput}"/>
+				</finally>
+			</trycatch>
+		 </else>
+	</if> 
+	<antcall target="CopyDumpFile" />
+	</target>
+
+	<!--Remove C:\Automation from test VM-->
+	<target name="DeleteAutomationFilesOnVM">
+	<if>
+		<or>
+			<equals arg1="${SiteCode}" arg2="zhuhai"/>
+			<contains string="${Test.Type}" substring="E2E"/>
+		</or>
+		<then>
+			<trycatch property="Msg.DeleteAutomationFiles">
+				<try>
+					<echo message="Delete automation files ${Automation.Work.dir} on VM"/>
+					<delete includeEmptyDirs="true">
+						<fileset dir="${Automation.Work.dir}" excludes="NightlyBuild/"/>
+					</delete>
+				</try>
+				<catch>
+					<echo message="${Msg.DeleteAutomationFiles}"/>
+				</catch>
+			</trycatch>
+		</then>
+	</if>
+	</target>
+	
+	<target name="CopyDumpFile">
+		<echo message="Copy dump file"/>
+		<if>
+			<equals arg1="${SiteCode}" arg2="skytap"/>
+			<then>
+				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
+				<exec executable="cmd">
+					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+				<exec executable="cmd">
+					<arg line="/c dir C:\DumpFolder"/>
+				</exec>
+				<copy todir="\\10.6.208.3\Share\DataHubFiles\dump" failonerror="false">
+					<fileset dir="C:\DumpFolder">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+			</then>
+			<else>
+				<!-- Strange that there is no dump file when process crashes, there should be one since window error reporting services entered into running state-->
+				<exec executable="cmd">
+					<arg line="/c dir C:\Windows\ServiceProfiles\LocalService"/>
+				</exec>
+				<copy todir="\\10.240.41.132\devshare\reports\tic\dumpfiles">
+					<fileset dir="C:\Windows\ServiceProfiles\LocalService">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+				<exec executable="cmd">
+					<arg line="/c dir C:\DumpFolder"/>
+				</exec>
+				<copy todir="\\10.240.41.132\devshare\reports\tic\dumpfiles" failonerror="false">
+					<fileset dir="C:\DumpFolder">
+						<include name="*.dmp"/>
+					</fileset>
+				</copy>
+			</else>
+		</if>
+	</target>
+</project>

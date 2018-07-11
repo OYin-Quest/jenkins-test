@@ -1,0 +1,2 @@
+PyGithub
+argparse # for python < 2.7

@@ -1,0 +1,43 @@
+<project name="AutomationTesting" basedir="." default="RunAutomation">
+	<import file="test.common.xml" />
+
+	<!--RunAutomation is main target,it call other target to run-->
+	<target name="RunAutomation"> 
+		<antcall target="EchoAntProperty"/>
+		<antcall target="InitWorkSpace"/>
+		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
+		<antcall target="SetBuildDisplayName">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+		<antcall target="CopyAutomationFilesToVM">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+		<antcall target="RunTestCasesOnVM"/>
+		<antcall target="ProcessTestCasesResults"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+	
+	<target name="Preparation">
+		<antcall target="EchoAntProperty"/>
+		<antcall target="InitWorkSpace"/>
+		<antcallback target="GetInstallerFileName" return="InstallerFileName"/>
+		<antcall target="SetBuildDisplayName">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+		<antcall target="CopyAutomationFilesToVM">
+			<param name="InstallerFileName" value="${InstallerFileName}"/>
+		</antcall>
+	</target>
+	
+	<target name="RunTest">
+		<antcall target="RunTestCasesOnVM"/>
+		<antcall target="ProcessTestCasesResults"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+	
+	<target name="RunTestInPython">
+		<antcall target="RunTestCasesInPython"/>
+		<antcall target="CopyDumpFile"/>
+		<antcall target="DeleteAutomationFilesOnVM"/>
+	</target>
+</project>
