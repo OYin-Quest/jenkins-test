@@ -1,5 +1,5 @@
 timestamps{
-	node('tcde-win7'){
+	node{
 		try{
 			echo "hello, world"
 			stage('Preparation'){
