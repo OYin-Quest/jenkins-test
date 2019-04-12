@@ -8,6 +8,10 @@ timestamps{
 			stage('run'){
 				echo 'run'
 			}
+			
+			stage('deploy'){
+				echo 'deploy'
+			}
 		} catch(error){
 			echo "catch"
 			throw error
