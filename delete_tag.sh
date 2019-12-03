@@ -7,11 +7,11 @@ DIR="$( dirname "$SOURCE" )"
 
 input="$DIR/tag.txt"
 
-while read -r line || [ -n  "$line" ];
+while IFS=$'\r' read line || [ -n  "$line" ];
 do
-	# printf "\n$line Deleting remote tag...\n"
+	printf "\n$line Deleting remote tag...\n"
 	git push origin --delete $line
 	
-	# printf "\n$line Deleting local tag...\n"
+	printf "\n$line Deleting local tag...\n"
 	git tag -d $line
 done < "$input"

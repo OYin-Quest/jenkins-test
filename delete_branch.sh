@@ -7,7 +7,7 @@ DIR="$( dirname "$SOURCE" )"
 
 input="$DIR/branch.txt"
 
-while read -r line || [ -n  "$line" ];
+while IFS=$'\r' read line || [ -n  "$line" ];
 do
 	printf "\n$line Deleting remote tag...\n"
 	git tag -l | grep $line | xargs git push origin --delete tag
