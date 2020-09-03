@@ -5,9 +5,10 @@ GITHUB_PROJECT_REPO = "https://${GITHUB_ENDPOINT_API}/repos/OYin-Quest/jenkins-t
 GITHUB_SCRIPTS_AND_CONFIGURATION_CONTENTS_URL = "https://${GITHUB_ENDPOINT_API}/repos/OYin-Quest/jenkins-test/contents"
 GITHUB_MAPPING_URL = "${GITHUB_SCRIPTS_AND_CONFIGURATION_CONTENTS_URL}/pipeline/src/mapping.groovy"
 GITHUB_TRIGGERS_URL = "https://raw.githubusercontent.com/OYin-Quest/jenkins-test/${env.BRANCH_NAME}/groovy/triggers.groovy"
+GITHUB_MAPPINGS_URL = "https://raw.githubusercontent.com/OYin-Quest/jenkins-test/${env.BRANCH_NAME}/groovy/tdpmapping.groovy"
 
 
-def mapping = null
+def mappings = null
 def triggers = null
 
 timestamps{
@@ -19,6 +20,10 @@ timestamps{
 				response = GITHUB_TRIGGERS_URL.toURL().getText(requestProperties: ['Accept': "application/vnd.github.v3.raw"])
 				echo response
 				triggers = evaluate(response)
+				
+				response = GITHUB_MAPPINGS_URL.toURL().getText(requestProperties: ['Accept': "application/vnd.github.v3.raw"])
+				echo response
+				mappings = evaluate(response)
 			}
 		
 			// groovy file will not available unless source code is cloned.
@@ -26,6 +31,16 @@ timestamps{
 		
 			echo "hello, world"
 			stage('Preparation'){
+				
+				name = mappings.callMappingOnBranch('branchName', env.BRANCH_NAME)
+				echo name
+				
+				version = mappings.callMappingOnBranch('version', env.BRANCH_NAME)
+				echo version
+			
+			
+			
+			
 				echo 'creating vm'
 				triggers.callTriggerOnBranch("on_commit", env.BRANCH_NAME)
 				
