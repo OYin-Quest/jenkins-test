@@ -37,8 +37,13 @@ timestamps{
 				
 				version = mappings.callMappingOnBranch('version', env.BRANCH_NAME)
 				echo version
+				
+				
+				name_new = mappings.getTDPMapping('branchName', env.BRANCH_NAME)
+				echo name_new
 			
-			
+				version_new = mappings.getTDPMapping('version', env.BRANCH_NAME)
+				echo version_new
 			
 			
 				echo 'creating vm'
