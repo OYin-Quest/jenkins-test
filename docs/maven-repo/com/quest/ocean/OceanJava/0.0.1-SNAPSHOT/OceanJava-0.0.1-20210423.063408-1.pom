@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.quest.ocean</groupId>
+  <artifactId>OceanJava</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>OceanJava</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>4.13.2</junit.version>
+	<maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
+	<java.version>15</java.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <distributionManagement>
+  	<repository>
+  		<id>local-repo-release</id>
+  		<name>GitHub Release</name>
+  		<url>file://${project.basedir}/maven-repo</url>
+  	</repository>
+  </distributionManagement>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<artifactId>maven-source-plugin</artifactId>
+  			<executions>
+  				<execution>
+  					<id>attach-source</id>
+  					<phase>package</phase>
+  					<goals>
+  						<goal>jar-no-fork</goal>
+  					</goals>
+  				</execution>
+  			</executions>
+  		</plugin>
+  		<plugin>
+  			<artifactId>maven-javadoc-plugin</artifactId>
+  			<executions>
+  				<execution>
+  					<id>attach-javadocs</id>
+  					<phase>package</phase>
+  					<goals>
+  						<goal>jar</goal>
+  					</goals>
+  				</execution>
+  			</executions>
+  		</plugin>
+  	</plugins>
+  </build>
+  
+</project>
